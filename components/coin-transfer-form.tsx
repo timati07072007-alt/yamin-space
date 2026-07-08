@@ -19,6 +19,9 @@ const DEV_MOCK_RECEIVER_ID = 999_000_001;
 const DEV_MOCK_RECEIVER_NAME = "MOCK-получатель";
 const SIMULATION_DELAY_MS = 900;
 
+const inputClass =
+  "w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-600 outline-none transition-all focus:border-emerald-400/40 focus:bg-white/[0.07] focus:ring-2 focus:ring-emerald-400/15 disabled:cursor-not-allowed disabled:opacity-50";
+
 interface CoinTransferFormProps {
   sender: DbUser;
   isDevMode: boolean;
@@ -41,7 +44,9 @@ export function CoinTransferForm({ sender, isDevMode }: CoinTransferFormProps) {
 
   const isLoading = status === "loading";
 
-  async function simulateTransfer(parsedAmount: number): Promise<TransferResult> {
+  async function simulateTransfer(
+    parsedAmount: number,
+  ): Promise<TransferResult> {
     await delay(SIMULATION_DELAY_MS);
 
     if (devOutcome === "limit") {
@@ -95,21 +100,16 @@ export function CoinTransferForm({ sender, isDevMode }: CoinTransferFormProps) {
   }
 
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, ease: "easeOut", delay: 0.2 }}
-      className="w-full max-w-sm overflow-hidden rounded-3xl border border-sky-100 bg-gradient-to-br from-sky-50 via-white to-indigo-50 shadow-xl shadow-sky-100/70"
-    >
-      <div className="flex items-center gap-3 border-b border-sky-100/80 px-5 py-4">
-        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-600 text-white">
+    <section className="w-full max-w-sm overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/40 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.8)] backdrop-blur-xl">
+      <div className="flex items-center gap-3 border-b border-white/5 px-5 py-4">
+        <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-amber-400/20 bg-amber-400/10 text-amber-300">
           <HandCoins className="h-5 w-5" />
         </div>
         <div>
-          <h2 className="text-sm font-semibold text-sky-800">
+          <h2 className="text-sm font-semibold tracking-wide text-zinc-100">
             Поделиться савабом
           </h2>
-          <p className="text-xs text-sky-600/80">
+          <p className="text-xs text-zinc-500">
             Максимум 50 монет одному человеку в сутки
           </p>
         </div>
@@ -117,7 +117,7 @@ export function CoinTransferForm({ sender, isDevMode }: CoinTransferFormProps) {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 px-5 py-5">
         <label className="flex flex-col gap-1.5">
-          <span className="text-xs font-medium text-zinc-600">
+          <span className="text-xs font-medium uppercase tracking-wider text-zinc-500">
             ID получателя
           </span>
           <input
@@ -127,17 +127,17 @@ export function CoinTransferForm({ sender, isDevMode }: CoinTransferFormProps) {
             onChange={(event) => setReceiverId(event.target.value)}
             placeholder="Например, 123456789"
             disabled={isLoading || isDevMode}
-            className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-2.5 text-sm text-zinc-900 outline-none transition-colors focus:border-sky-400 disabled:bg-zinc-50 disabled:text-zinc-500"
+            className={inputClass}
           />
           {isDevMode && (
-            <span className="text-xs text-amber-600">
+            <span className="text-xs text-amber-400/80">
               DEV-режим: получатель зафиксирован на {DEV_MOCK_RECEIVER_NAME}
             </span>
           )}
         </label>
 
         <label className="flex flex-col gap-1.5">
-          <span className="text-xs font-medium text-zinc-600">
+          <span className="text-xs font-medium uppercase tracking-wider text-zinc-500">
             Количество монет
           </span>
           <input
@@ -148,13 +148,13 @@ export function CoinTransferForm({ sender, isDevMode }: CoinTransferFormProps) {
             onChange={(event) => setAmount(event.target.value)}
             placeholder="0"
             disabled={isLoading}
-            className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-2.5 text-sm text-zinc-900 outline-none transition-colors focus:border-sky-400 disabled:bg-zinc-50"
+            className={inputClass}
           />
         </label>
 
         {isDevMode && (
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium text-zinc-600">
+            <span className="text-xs font-medium uppercase tracking-wider text-zinc-500">
               DEV: симуляция результата
             </span>
             <select
@@ -163,7 +163,7 @@ export function CoinTransferForm({ sender, isDevMode }: CoinTransferFormProps) {
                 setDevOutcome(event.target.value as DevOutcome)
               }
               disabled={isLoading}
-              className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-2.5 text-sm text-zinc-900 outline-none transition-colors focus:border-sky-400"
+              className={`${inputClass} appearance-none [&>option]:bg-zinc-900`}
             >
               <option value="success">Успешный перевод</option>
               <option value="limit">Ошибка: превышен лимит</option>
@@ -174,8 +174,9 @@ export function CoinTransferForm({ sender, isDevMode }: CoinTransferFormProps) {
         <motion.button
           type="submit"
           disabled={isLoading}
-          whileTap={{ scale: 0.97 }}
-          className="flex items-center justify-center gap-2 rounded-2xl bg-sky-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-200 transition-colors hover:bg-sky-700 disabled:cursor-not-allowed disabled:bg-sky-400"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="flex items-center justify-center gap-2 rounded-2xl border border-emerald-400/25 bg-gradient-to-r from-emerald-500/80 to-emerald-600/80 px-4 py-3.5 text-sm font-semibold text-emerald-50 shadow-[0_8px_32px_-8px_rgba(16,185,129,0.5)] transition-colors hover:from-emerald-500 hover:to-emerald-600 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isLoading ? (
             <>
@@ -198,7 +199,7 @@ export function CoinTransferForm({ sender, isDevMode }: CoinTransferFormProps) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.25 }}
-              className="flex items-start gap-2 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
+              className="flex items-start gap-2 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300"
             >
               <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
               <span>{message}</span>
@@ -212,7 +213,7 @@ export function CoinTransferForm({ sender, isDevMode }: CoinTransferFormProps) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.25 }}
-              className="flex items-start gap-2 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700"
+              className="flex items-start gap-2 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-300"
             >
               <XCircle className="mt-0.5 h-4 w-4 shrink-0" />
               <span>{message}</span>
@@ -220,6 +221,6 @@ export function CoinTransferForm({ sender, isDevMode }: CoinTransferFormProps) {
           )}
         </AnimatePresence>
       </form>
-    </motion.section>
+    </section>
   );
 }

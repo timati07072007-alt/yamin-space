@@ -15,15 +15,26 @@ export interface PrayerSlot {
   timeLabel: string;
 }
 
+export interface SunEvent {
+  label: string;
+  time: Date;
+  timeLabel: string;
+}
+
 export interface PrayerSchedule {
   city: string;
   dateLabel: string;
   prayers: PrayerSlot[];
+  sunrise: SunEvent;
+  sunset: SunEvent;
   currentPrayer: PrayerName | null;
   nextPrayer: PrayerName;
   nextPrayerTime: Date;
+  nextPrayerTimeLabel: string;
   countdownLabel: string;
   countdownMs: number;
+  /** Доля пройденного интервала между прошлым и следующим намазом: 0..1 */
+  intervalProgress: number;
 }
 
 export const PRAYER_LABELS: Record<PrayerName, string> = {
@@ -48,6 +59,10 @@ const BISHKEK_UTC_OFFSET_HOURS = 6;
 
 const BISHKEK_COORDINATES = new Coordinates(42.8746, 74.5698);
 
+/**
+ * Метод Университета Карачи (18°/18°) с ханафитским асром — стандарт,
+ * которого придерживается Духовное управление мусульман Кыргызстана.
+ */
 const BISHKEK_CALCULATION = (() => {
   const params = CalculationMethod.Karachi();
   params.madhab = Madhab.Hanafi;
@@ -141,6 +156,7 @@ export function getPrayerSchedule(now: Date = new Date()): PrayerSchedule {
   const calendarDate = getBishkekCalendarDate(now);
   const todayTimes = createPrayerTimes(calendarDate);
   const tomorrowTimes = createPrayerTimes(addDays(calendarDate, 1));
+  const yesterdayTimes = createPrayerTimes(addDays(calendarDate, -1));
 
   const prayers = buildPrayerSlots(todayTimes);
   const fajrToday = prayers[0].time;
@@ -149,19 +165,23 @@ export function getPrayerSchedule(now: Date = new Date()): PrayerSchedule {
   let currentPrayer: PrayerName | null = null;
   let nextPrayer: PrayerName = "fajr";
   let nextPrayerTime = tomorrowTimes.fajr;
+  let previousTime = ishaToday;
 
   if (now < fajrToday) {
     currentPrayer = "isha";
     nextPrayer = "fajr";
     nextPrayerTime = fajrToday;
+    previousTime = yesterdayTimes.isha;
   } else if (now >= ishaToday) {
     currentPrayer = "isha";
     nextPrayer = "fajr";
     nextPrayerTime = tomorrowTimes.fajr;
+    previousTime = ishaToday;
   } else {
     for (const prayer of prayers) {
       if (now >= prayer.time) {
         currentPrayer = prayer.name;
+        previousTime = prayer.time;
       }
     }
 
@@ -175,14 +195,31 @@ export function getPrayerSchedule(now: Date = new Date()): PrayerSchedule {
 
   const countdownMs = Math.max(0, nextPrayerTime.getTime() - now.getTime());
 
+  const intervalMs = nextPrayerTime.getTime() - previousTime.getTime();
+  const elapsedMs = now.getTime() - previousTime.getTime();
+  const intervalProgress =
+    intervalMs > 0 ? Math.min(1, Math.max(0, elapsedMs / intervalMs)) : 0;
+
   return {
     city: BISHKEK_CITY,
     dateLabel: formatDateLabel(now),
     prayers,
+    sunrise: {
+      label: "Восход",
+      time: todayTimes.sunrise,
+      timeLabel: formatTime(todayTimes.sunrise),
+    },
+    sunset: {
+      label: "Закат",
+      time: todayTimes.sunset,
+      timeLabel: formatTime(todayTimes.sunset),
+    },
     currentPrayer,
     nextPrayer,
     nextPrayerTime,
+    nextPrayerTimeLabel: formatTime(nextPrayerTime),
     countdownLabel: `До ${PRAYER_LABELS_GENITIVE[nextPrayer]}`,
     countdownMs,
+    intervalProgress,
   };
 }

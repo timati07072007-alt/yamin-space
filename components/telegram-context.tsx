@@ -61,8 +61,8 @@ async function waitForTelegramSession(): Promise<{
 
 function applyTelegramTheme(app: TelegramWebApp): void {
   try {
-    app.setHeaderColor("#0f766e");
-    app.setBackgroundColor("#f4f4f5");
+    app.setHeaderColor("#0a1512");
+    app.setBackgroundColor("#070d0b");
   } catch (error) {
     console.warn("[Telegram] Failed to apply theme colors:", error);
   }
