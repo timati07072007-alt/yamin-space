@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 
-import { AdhkarHub } from "@/components/adhkar-hub";
 import { DailyInspiration } from "@/components/daily-inspiration";
 import { DailyQuiz } from "@/components/daily-quiz";
 import { PrayerTimesWidget } from "@/components/prayer-times-widget";
@@ -28,9 +27,6 @@ export function HomeHub() {
       </motion.div>
       <motion.div variants={staggerItem} className="w-full max-w-sm">
         <QiblaCompass />
-      </motion.div>
-      <motion.div variants={staggerItem} className="w-full max-w-sm">
-        <AdhkarHub />
       </motion.div>
     </motion.div>
   );

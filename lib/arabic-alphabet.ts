@@ -1,62 +1,84 @@
+export interface LetterForms {
+  isolated: string;
+  initial: string;
+  medial: string;
+  final: string;
+}
+
+export interface ArabicLetterFull {
+  id: string;
+  char: string;
+  name: string;
+  transliteration: string;
+  speech: string;
+  forms: LetterForms;
+  connectsLeft: boolean;
+}
+
+export const ARABIC_ALPHABET_FULL: ArabicLetterFull[] = [
+  { id: "alif", char: "ا", name: "Алиф", transliteration: "а / ā", speech: "ا", connectsLeft: false, forms: { isolated: "ا", initial: "ا", medial: "ـا", final: "ـا" } },
+  { id: "ba", char: "ب", name: "Ба", transliteration: "б", speech: "ب", connectsLeft: true, forms: { isolated: "ب", initial: "بـ", medial: "ـبـ", final: "ـب" } },
+  { id: "ta", char: "ت", name: "Та", transliteration: "т", speech: "ت", connectsLeft: true, forms: { isolated: "ت", initial: "تـ", medial: "ـتـ", final: "ـت" } },
+  { id: "tha", char: "ث", name: "Са", transliteration: "с (мягкое)", speech: "ث", connectsLeft: true, forms: { isolated: "ث", initial: "ثـ", medial: "ـثـ", final: "ـث" } },
+  { id: "jim", char: "ج", name: "Джим", transliteration: "дж", speech: "ج", connectsLeft: true, forms: { isolated: "ج", initial: "جـ", medial: "ـجـ", final: "ـج" } },
+  { id: "ha", char: "ح", name: "Ха", transliteration: "х (гортанное)", speech: "ح", connectsLeft: true, forms: { isolated: "ح", initial: "حـ", medial: "ـحـ", final: "ـح" } },
+  { id: "kha", char: "خ", name: "Хо", transliteration: "х", speech: "خ", connectsLeft: true, forms: { isolated: "خ", initial: "خـ", medial: "ـخـ", final: "ـخ" } },
+  { id: "dal", char: "د", name: "Даль", transliteration: "д", speech: "د", connectsLeft: false, forms: { isolated: "د", initial: "د", medial: "ـد", final: "ـد" } },
+  { id: "dhal", char: "ذ", name: "Заль", transliteration: "з", speech: "ذ", connectsLeft: false, forms: { isolated: "ذ", initial: "ذ", medial: "ـذ", final: "ـذ" } },
+  { id: "ra", char: "ر", name: "Ра", transliteration: "р", speech: "ر", connectsLeft: false, forms: { isolated: "ر", initial: "ر", medial: "ـر", final: "ـر" } },
+  { id: "zay", char: "ز", name: "Зай", transliteration: "з", speech: "ز", connectsLeft: false, forms: { isolated: "ز", initial: "ز", medial: "ـز", final: "ـز" } },
+  { id: "sin", char: "س", name: "Син", transliteration: "с", speech: "س", connectsLeft: true, forms: { isolated: "س", initial: "سـ", medial: "ـسـ", final: "ـس" } },
+  { id: "shin", char: "ش", name: "Шин", transliteration: "ш", speech: "ش", connectsLeft: true, forms: { isolated: "ش", initial: "شـ", medial: "ـشـ", final: "ـش" } },
+  { id: "sad", char: "ص", name: "Сад", transliteration: "с (эмфатическое)", speech: "ص", connectsLeft: true, forms: { isolated: "ص", initial: "صـ", medial: "ـصـ", final: "ـص" } },
+  { id: "dad", char: "ض", name: "Дад", transliteration: "д (эмфатическое)", speech: "ض", connectsLeft: true, forms: { isolated: "ض", initial: "ضـ", medial: "ـضـ", final: "ـض" } },
+  { id: "ta2", char: "ط", name: "Та (эмфат.)", transliteration: "т (твёрдое)", speech: "ط", connectsLeft: true, forms: { isolated: "ط", initial: "طـ", medial: "ـطـ", final: "ـط" } },
+  { id: "za", char: "ظ", name: "За (эмфат.)", transliteration: "з (твёрдое)", speech: "ظ", connectsLeft: true, forms: { isolated: "ظ", initial: "ظـ", medial: "ـظـ", final: "ـظ" } },
+  { id: "ayn", char: "ع", name: "Айн", transliteration: "ъ (гортанное)", speech: "ع", connectsLeft: true, forms: { isolated: "ع", initial: "عـ", medial: "ـعـ", final: "ـع" } },
+  { id: "ghayn", char: "غ", name: "Гайн", transliteration: "г (гортанное)", speech: "غ", connectsLeft: true, forms: { isolated: "غ", initial: "غـ", medial: "ـغـ", final: "ـغ" } },
+  { id: "fa", char: "ف", name: "Фа", transliteration: "ф", speech: "ف", connectsLeft: true, forms: { isolated: "ف", initial: "فـ", medial: "ـفـ", final: "ـف" } },
+  { id: "qaf", char: "ق", name: "Каф", transliteration: "к (глубокое)", speech: "ق", connectsLeft: true, forms: { isolated: "ق", initial: "قـ", medial: "ـقـ", final: "ـق" } },
+  { id: "kaf", char: "ك", name: "Каф (мягк.)", transliteration: "к", speech: "ك", connectsLeft: true, forms: { isolated: "ك", initial: "كـ", medial: "ـكـ", final: "ـك" } },
+  { id: "lam", char: "ل", name: "Лям", transliteration: "л", speech: "ل", connectsLeft: true, forms: { isolated: "ل", initial: "لـ", medial: "ـلـ", final: "ـل" } },
+  { id: "mim", char: "م", name: "Мим", transliteration: "м", speech: "م", connectsLeft: true, forms: { isolated: "م", initial: "مـ", medial: "ـمـ", final: "ـم" } },
+  { id: "nun", char: "ن", name: "Нун", transliteration: "н", speech: "ن", connectsLeft: true, forms: { isolated: "ن", initial: "نـ", medial: "ـنـ", final: "ـن" } },
+  { id: "ha2", char: "ه", name: "Ха (мягк.)", transliteration: "х", speech: "ه", connectsLeft: true, forms: { isolated: "ه", initial: "هـ", medial: "ـهـ", final: "ـه" } },
+  { id: "waw", char: "و", name: "Вав", transliteration: "у / в / ū", speech: "و", connectsLeft: false, forms: { isolated: "و", initial: "و", medial: "ـو", final: "ـو" } },
+  { id: "ya", char: "ي", name: "Йа", transliteration: "й / ī", speech: "ي", connectsLeft: true, forms: { isolated: "ي", initial: "يـ", medial: "ـيـ", final: "ـي" } },
+];
+
+/** @deprecated Use ARABIC_ALPHABET_FULL */
 export interface ArabicLetter {
   char: string;
   name: string;
   transliteration: string;
-  /** Произношение для Web Speech API (арабская буква). */
   speech: string;
 }
 
-export const ARABIC_ALPHABET: ArabicLetter[] = [
-  { char: "ا", name: "Алиф", transliteration: "а", speech: "ا" },
-  { char: "ب", name: "Ба", transliteration: "б", speech: "ب" },
-  { char: "ت", name: "Та", transliteration: "т", speech: "ت" },
-  { char: "ث", name: "Са", transliteration: "с", speech: "ث" },
-  { char: "ج", name: "Джим", transliteration: "дж", speech: "ج" },
-  { char: "ح", name: "Ха", transliteration: "х", speech: "ح" },
-  { char: "خ", name: "Хо", transliteration: "х", speech: "خ" },
-  { char: "د", name: "Даль", transliteration: "д", speech: "د" },
-  { char: "ذ", name: "Заль", transliteration: "з", speech: "ذ" },
-  { char: "ر", name: "Ра", transliteration: "р", speech: "ر" },
-  { char: "ز", name: "Зай", transliteration: "з", speech: "ز" },
-  { char: "س", name: "Син", transliteration: "с", speech: "س" },
-  { char: "ش", name: "Шин", transliteration: "ш", speech: "ش" },
-  { char: "ص", name: "Сад", transliteration: "с", speech: "ص" },
-  { char: "ض", name: "Дад", transliteration: "д", speech: "ض" },
-  { char: "ط", name: "Та", transliteration: "т", speech: "ط" },
-  { char: "ظ", name: "За", transliteration: "з", speech: "ظ" },
-  { char: "ع", name: "Айн", transliteration: "ъ", speech: "ع" },
-  { char: "غ", name: "Гайн", transliteration: "г", speech: "غ" },
-  { char: "ف", name: "Фа", transliteration: "ф", speech: "ف" },
-  { char: "ق", name: "Каф", transliteration: "к", speech: "ق" },
-  { char: "ك", name: "Каф", transliteration: "к", speech: "ك" },
-  { char: "ل", name: "Лям", transliteration: "л", speech: "ل" },
-  { char: "م", name: "Мим", transliteration: "м", speech: "م" },
-  { char: "ن", name: "Нун", transliteration: "н", speech: "ن" },
-  { char: "ه", name: "Ха", transliteration: "х", speech: "ه" },
-  { char: "و", name: "Вав", transliteration: "у/в", speech: "و" },
-  { char: "ي", name: "Йа", transliteration: "й", speech: "ي" },
-];
+export const ARABIC_ALPHABET: ArabicLetter[] = ARABIC_ALPHABET_FULL.map(
+  ({ char, name, transliteration, speech }) => ({
+    char,
+    name,
+    transliteration,
+    speech,
+  }),
+);
+
+export function speakArabic(text: string): void {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "ar-SA";
+  utterance.rate = 0.82;
+  window.speechSynthesis.speak(utterance);
+}
 
 export function speakArabicLetter(speech: string): void {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-    return;
-  }
-
-  window.speechSynthesis.cancel();
-
-  const utterance = new SpeechSynthesisUtterance(speech);
-  utterance.lang = "ar-SA";
-  utterance.rate = 0.85;
-  window.speechSynthesis.speak(utterance);
+  speakArabic(speech);
 }
 
 export function pickGameOptions(correctIndex: number): ArabicLetter[] {
   const correct = ARABIC_ALPHABET[correctIndex];
   const pool = ARABIC_ALPHABET.filter((_, index) => index !== correctIndex);
-
   const shuffled = [...pool].sort(() => Math.random() - 0.5);
-  const distractors = shuffled.slice(0, 3);
-  const options = [...distractors, correct].sort(() => Math.random() - 0.5);
-
-  return options;
+  return [...shuffled.slice(0, 3), correct].sort(() => Math.random() - 0.5);
 }

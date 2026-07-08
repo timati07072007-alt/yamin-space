@@ -1,75 +1,119 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { BookOpen, Grid3X3, Languages } from "lucide-react";
 import { useState } from "react";
 
+import { ArabicAlphabetPanel } from "@/components/arabic-alphabet-panel";
+import { ArabicDictionaryPanel } from "@/components/arabic-dictionary-panel";
+import { ArabicGrammarPanel } from "@/components/arabic-grammar-panel";
 import { cozyCardClass, staggerContainer, staggerItem } from "@/lib/animations";
-import {
-  ARABIC_MODULE_LABELS,
-  type ArabicModuleId,
-} from "@/lib/arabic-modules";
 import { hapticSelection } from "@/lib/haptic";
 
-import { ArabicLessons } from "./arabic-lessons";
+type ArabicSection = "alphabet" | "words" | "grammar";
 
-const MODULE_IDS = Object.keys(ARABIC_MODULE_LABELS) as ArabicModuleId[];
+const SECTIONS: Array<{
+  id: ArabicSection;
+  label: string;
+  desc: string;
+  icon: typeof Grid3X3;
+  color: string;
+}> = [
+  {
+    id: "alphabet",
+    label: "Алфавит",
+    desc: "28 букв с формами",
+    icon: Grid3X3,
+    color: "from-emerald-100 to-teal-50",
+  },
+  {
+    id: "words",
+    label: "Слова",
+    desc: "Словарь с озвучкой",
+    icon: Languages,
+    color: "from-sky-100 to-blue-50",
+  },
+  {
+    id: "grammar",
+    label: "Правила",
+    desc: "Грамматика",
+    icon: BookOpen,
+    color: "from-violet-100 to-purple-50",
+  },
+];
 
 export function ArabicHub() {
-  const [activeModule, setActiveModule] = useState<ArabicModuleId>("letters");
+  const [section, setSection] = useState<ArabicSection>("alphabet");
 
   return (
     <motion.div
       variants={staggerContainer}
       initial="hidden"
       animate="visible"
-      className="flex w-full flex-col items-center gap-5"
+      className="flex w-full flex-col items-center gap-4"
     >
-      <motion.section
+      <motion.header
         variants={staggerItem}
-        className={`${cozyCardClass} max-w-sm px-5 py-4`}
+        className={`${cozyCardClass} max-w-sm px-5 py-4 text-center`}
       >
-        <h2 className="text-sm font-semibold text-[var(--theme-text)]">
-          Модули
-        </h2>
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          {MODULE_IDS.map((modId) => {
-            const mod = ARABIC_MODULE_LABELS[modId];
-            const isActive = activeModule === modId;
-            return (
-              <motion.button
-                key={modId}
-                type="button"
-                onClick={() => {
-                  hapticSelection();
-                  setActiveModule(modId);
-                }}
-                whileHover={{ scale: 1.04, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                className={`rounded-3xl border px-3 py-3 text-left shadow-sm transition-colors ${
-                  isActive
-                    ? "border-emerald-400 bg-gradient-to-br from-emerald-100 to-teal-50 ring-2 ring-emerald-300/60 dark:from-emerald-950/60 dark:to-teal-950/40"
-                    : `border-white/80 bg-gradient-to-br ${mod.color} dark:border-stone-700`
-                }`}
-              >
-                <span className="text-xl">{mod.emoji}</span>
-                <p className="mt-1 text-xs font-semibold text-[var(--theme-text)]">
-                  {mod.title}
-                </p>
-              </motion.button>
-            );
-          })}
-        </div>
-      </motion.section>
+        <p className="text-lg font-semibold text-[var(--theme-text)]">
+          Арабский язык
+        </p>
+        <p className="mt-1 text-xs text-[var(--theme-text-muted)]">
+          Алфавит → Слова → Правила и грамматика
+        </p>
+      </motion.header>
 
-      <motion.div
-        key={activeModule}
+      <motion.nav
         variants={staggerItem}
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-sm"
+        className={`${cozyCardClass} flex max-w-sm gap-1.5 p-1.5`}
       >
-        <ArabicLessons module={activeModule} />
-      </motion.div>
+        {SECTIONS.map((item) => {
+          const Icon = item.icon;
+          const active = section === item.id;
+          return (
+            <motion.button
+              key={item.id}
+              type="button"
+              onClick={() => {
+                hapticSelection();
+                setSection(item.id);
+              }}
+              whileTap={{ scale: 0.95 }}
+              className={`relative flex flex-1 flex-col items-center gap-0.5 rounded-2xl px-1 py-2.5 ${
+                active ? "text-emerald-800" : "text-[var(--theme-text-muted)]"
+              }`}
+            >
+              {active && (
+                <motion.span
+                  layoutId="arabic-section-active"
+                  transition={{ type: "spring", stiffness: 400, damping: 28 }}
+                  className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${item.color} dark:opacity-40`}
+                />
+              )}
+              <Icon className="relative h-4 w-4" />
+              <span className="relative text-[10px] font-semibold leading-tight">
+                {item.label}
+              </span>
+            </motion.button>
+          );
+        })}
+      </motion.nav>
+
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={section}
+          initial={{ opacity: 0, y: 16, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -12, scale: 0.98 }}
+          transition={{ type: "spring", stiffness: 320, damping: 28 }}
+          className="w-full max-w-sm"
+        >
+          {section === "alphabet" && <ArabicAlphabetPanel />}
+          {section === "words" && <ArabicDictionaryPanel />}
+          {section === "grammar" && <ArabicGrammarPanel />}
+        </motion.div>
+      </AnimatePresence>
     </motion.div>
   );
 }

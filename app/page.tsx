@@ -9,6 +9,7 @@ import { ArabicHub } from "@/components/arabic-hub";
 import { HomeHub } from "@/components/home-hub";
 import { LibraryHub } from "@/components/library-hub";
 import { ProfileHub } from "@/components/profile-hub";
+import { TasbihHub } from "@/components/tasbih-hub";
 import { useTelegram } from "@/components/telegram-provider";
 import { pageVariants } from "@/lib/animations";
 import { normalizeDbUser } from "@/lib/users";
@@ -76,6 +77,7 @@ function AppShell({
             className="flex w-full flex-col items-center"
           >
             {activeTab === "home" && <HomeHub />}
+            {activeTab === "tasbih" && <TasbihHub />}
             {activeTab === "arabic" && <ArabicHub />}
             {activeTab === "academy" && <AcademyHub />}
             {activeTab === "library" && <LibraryHub />}
