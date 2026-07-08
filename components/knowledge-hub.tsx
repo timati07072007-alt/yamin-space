@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   BookMarked,
   BookOpenText,
-  BrainCircuit,
   Languages,
   Loader2,
   ScrollText,
@@ -37,12 +36,12 @@ const BooksSection = dynamic(
   { ssr: false, loading: () => <SectionLoader /> },
 );
 
-const QuizWizard = dynamic(
-  () => import("@/components/quiz-wizard").then((mod) => mod.QuizWizard),
+const ArabicSection = dynamic(
+  () => import("@/components/arabic-section").then((mod) => mod.ArabicSection),
   { ssr: false, loading: () => <SectionLoader /> },
 );
 
-type SectionId = "quran" | "hadiths" | "books" | "arabic" | "quiz";
+type SectionId = "quran" | "hadiths" | "books" | "arabic";
 
 interface SectionConfig {
   id: SectionId;
@@ -58,7 +57,7 @@ const SECTIONS: SectionConfig[] = [
     label: "Коран",
     icon: BookOpenText,
     searchable: true,
-    searchPlaceholder: "Название или номер суры...",
+    searchPlaceholder: "Фатиха, Корова, номер суры...",
   },
   {
     id: "hadiths",
@@ -75,28 +74,10 @@ const SECTIONS: SectionConfig[] = [
     searchPlaceholder: "Название или автор книги...",
   },
   { id: "arabic", label: "Арабский", icon: Languages, searchable: false },
-  { id: "quiz", label: "Квиз", icon: BrainCircuit, searchable: false },
 ];
 
 const cozyCard =
   "w-full max-w-sm overflow-hidden rounded-[2rem] border border-amber-900/10 bg-white/75 shadow-[0_20px_50px_-24px_rgba(146,104,41,0.35)] backdrop-blur-xl";
-
-function ArabicPlaceholder() {
-  return (
-    <div className="flex flex-col items-center gap-3 py-10 text-center">
-      <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-100/80 text-emerald-700">
-        <Languages className="h-7 w-7" />
-      </div>
-      <p className="text-sm font-medium text-stone-700">
-        Уроки арабского языка
-      </p>
-      <p className="max-w-[16rem] text-xs leading-relaxed text-stone-400">
-        Раздел в разработке. Скоро здесь появятся интерактивные уроки алфавита,
-        чтения и основ грамматики.
-      </p>
-    </div>
-  );
-}
 
 export function KnowledgeHub() {
   const [activeSection, setActiveSection] = useState<SectionId>("quran");
@@ -110,7 +91,16 @@ export function KnowledgeHub() {
   }
 
   return (
-    <section className={cozyCard}>
+    <motion.section
+      initial={{ opacity: 0, y: 24, scale: 0.96 }}
+      animate={{
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        transition: { type: "spring", stiffness: 260, damping: 22 },
+      }}
+      className={cozyCard}
+    >
       <div className="border-b border-stone-200/70 px-4 pb-0 pt-4">
         <div className="flex gap-1 overflow-x-auto pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {SECTIONS.map((item) => {
@@ -118,10 +108,12 @@ export function KnowledgeHub() {
             const isActive = activeSection === item.id;
 
             return (
-              <button
+              <motion.button
                 key={item.id}
                 type="button"
                 onClick={() => switchSection(item.id)}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
                 className="relative flex shrink-0 items-center gap-1.5 rounded-2xl px-3 py-2 text-xs font-medium"
               >
                 {isActive && (
@@ -143,7 +135,7 @@ export function KnowledgeHub() {
                 >
                   {item.label}
                 </span>
-              </button>
+              </motion.button>
             );
           })}
         </div>
@@ -166,19 +158,23 @@ export function KnowledgeHub() {
         <AnimatePresence mode="wait">
           <motion.div
             key={activeSection}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.22 }}
+            initial={{ opacity: 0, y: 14, scale: 0.98 }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              transition: { type: "spring", stiffness: 280, damping: 24 },
+            }}
+            exit={{ opacity: 0, y: -10, scale: 0.98 }}
+            transition={{ duration: 0.18 }}
           >
             {activeSection === "quran" && <QuranSection query={query} />}
             {activeSection === "hadiths" && <HadithSection query={query} />}
             {activeSection === "books" && <BooksSection query={query} />}
-            {activeSection === "arabic" && <ArabicPlaceholder />}
-            {activeSection === "quiz" && <QuizWizard />}
+            {activeSection === "arabic" && <ArabicSection />}
           </motion.div>
         </AnimatePresence>
       </div>
-    </section>
+    </motion.section>
   );
 }

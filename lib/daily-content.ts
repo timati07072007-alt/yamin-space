@@ -52,6 +52,34 @@ export function getDailyIndex(salt: string, modulo: number): number {
   return hashString(`${getBishkekDayKey()}:${salt}`) % modulo;
 }
 
+/** Несколько уникальных индексов на сегодня (для квиза дня). */
+export function getDailyIndices(
+  salt: string,
+  count: number,
+  modulo: number,
+): number[] {
+  if (modulo <= 0 || count <= 0) {
+    return [];
+  }
+
+  const picked: number[] = [];
+  let attempt = 0;
+  const maxAttempts = Math.max(count * 12, count);
+
+  while (picked.length < Math.min(count, modulo) && attempt < maxAttempts) {
+    const index =
+      hashString(`${getBishkekDayKey()}:${salt}:${attempt}`) % modulo;
+
+    if (!picked.includes(index)) {
+      picked.push(index);
+    }
+
+    attempt += 1;
+  }
+
+  return picked;
+}
+
 interface ApiAyahEdition {
   text: string;
   numberInSurah: number;

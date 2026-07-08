@@ -1,3 +1,5 @@
+import { getDailyIndices } from "@/lib/daily-content";
+
 export type QuizDifficulty = "easy" | "medium" | "hard";
 
 export interface Quiz {
@@ -47,6 +49,31 @@ export async function fetchQuizQuestions(
   const response = await fetch(`/api/quiz/${quizId}/questions`);
   const payload = await readJson<{ questions: QuizQuestion[] }>(response);
   return payload.questions;
+}
+
+export async function fetchDailyQuiz(): Promise<QuizQuestion[]> {
+  const response = await fetch("/api/quiz/daily");
+  const payload = await readJson<{ questions: QuizQuestion[] }>(response);
+  return payload.questions;
+}
+
+export async function fetchDevDailyQuiz(): Promise<QuizQuestion[]> {
+  await delay(300);
+
+  const indices = getDailyIndices("daily-quiz", 3, DEV_QUESTIONS.length);
+
+  return indices.map((index) => {
+    const question = DEV_QUESTIONS[index];
+
+    return {
+      id: question.id,
+      quiz_id: question.quiz_id,
+      question_text: question.question_text,
+      options: question.options,
+      xp_reward: question.xp_reward,
+      coins_reward: question.coins_reward,
+    };
+  });
 }
 
 export async function submitQuizAnswer(
@@ -121,6 +148,42 @@ const DEV_QUESTIONS: DevQuestion[] = [
     correct_option_index: 0,
     xp_reward: 15,
     coins_reward: 8,
+  },
+  {
+    id: 203,
+    quiz_id: 2,
+    question_text: "Куда был перенесён Пророк ﷺ в ночь Исра?",
+    options: ["Медина", "Иерусалим", "Мекка", "Тайф"],
+    correct_option_index: 1,
+    xp_reward: 12,
+    coins_reward: 6,
+  },
+  {
+    id: 204,
+    quiz_id: 1,
+    question_text: "Как называется свидетельство веры?",
+    options: ["Салят", "Шахада", "Закят", "Саум"],
+    correct_option_index: 1,
+    xp_reward: 10,
+    coins_reward: 5,
+  },
+  {
+    id: 205,
+    quiz_id: 1,
+    question_text: "Сколько сур в Коране?",
+    options: ["100", "114", "120", "99"],
+    correct_option_index: 1,
+    xp_reward: 10,
+    coins_reward: 5,
+  },
+  {
+    id: 206,
+    quiz_id: 1,
+    question_text: "Как называется направление для молитвы?",
+    options: ["Кибла", "Михраб", "Минбар", "Муаззин"],
+    correct_option_index: 0,
+    xp_reward: 10,
+    coins_reward: 5,
   },
 ];
 

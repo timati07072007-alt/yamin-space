@@ -15,6 +15,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 
 import { useTelegram } from "@/components/telegram-provider";
+import { fireCelebrationConfetti } from "@/lib/confetti";
 import {
   DEV_QUIZZES,
   fetchDevQuizQuestions,
@@ -217,6 +218,7 @@ export function QuizWizard() {
       }
 
       setClaimed(true);
+      fireCelebrationConfetti();
     } finally {
       setIsClaiming(false);
     }

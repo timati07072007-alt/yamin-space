@@ -21,6 +21,10 @@ import {
   type Surah,
   type SurahContent,
 } from "@/lib/quran";
+import {
+  getSurahRussianMeta,
+  surahMatchesQuery,
+} from "@/lib/surah-names-ru";
 
 interface QuranSectionProps {
   query: string;
@@ -295,15 +299,8 @@ export function QuranSection({ query }: QuranSectionProps) {
     );
   }
 
-  const normalized = query.trim().toLowerCase();
-  const filtered = normalized
-    ? surahs.filter(
-        (surah) =>
-          surah.englishName.toLowerCase().includes(normalized) ||
-          surah.translationName.toLowerCase().includes(normalized) ||
-          surah.arabicName.includes(query.trim()) ||
-          String(surah.number) === normalized,
-      )
+  const filtered = query.trim()
+    ? surahs.filter((surah) => surahMatchesQuery(surah, query))
     : surahs;
 
   return (
@@ -328,7 +325,10 @@ export function QuranSection({ query }: QuranSectionProps) {
               Ничего не найдено
             </li>
           )}
-          {filtered.map((surah) => (
+          {filtered.map((surah) => {
+            const ruMeta = getSurahRussianMeta(surah.number);
+
+            return (
             <li key={surah.number}>
               <button
                 type="button"
@@ -340,10 +340,11 @@ export function QuranSection({ query }: QuranSectionProps) {
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-medium text-stone-700">
-                    {surah.englishName}
+                    {ruMeta?.name ?? surah.englishName}
                   </span>
                   <span className="block truncate text-xs text-stone-400">
-                    {surah.translationName} · {surah.ayahCount} аятов
+                    {ruMeta?.meaning ?? surah.translationName} · {surah.ayahCount}{" "}
+                    аятов
                   </span>
                 </span>
                 <span className="shrink-0 text-lg text-stone-600" lang="ar">
@@ -351,7 +352,8 @@ export function QuranSection({ query }: QuranSectionProps) {
                 </span>
               </button>
             </li>
-          ))}
+            );
+          })}
         </motion.ul>
       )}
     </AnimatePresence>

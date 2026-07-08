@@ -7,7 +7,9 @@ import { useState } from "react";
 import { BottomNav, type TabId } from "@/components/bottom-nav";
 import { CoinTransferForm } from "@/components/coin-transfer-form";
 import { DailyInspiration } from "@/components/daily-inspiration";
+import { DailyQuiz } from "@/components/daily-quiz";
 import { KnowledgeHub } from "@/components/knowledge-hub";
+import { LevelTestCard } from "@/components/level-test-card";
 import { PrayerTimesWidget } from "@/components/prayer-times-widget";
 import { QiblaCompass } from "@/components/qibla-compass";
 import { useTelegram } from "@/components/telegram-provider";
@@ -59,18 +61,18 @@ interface HomeContentProps {
 }
 
 const screenVariants = {
-  initial: { opacity: 0, y: 18, scale: 0.99 },
+  initial: { opacity: 0, y: 28, scale: 0.94 },
   animate: {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.35, ease: "easeOut" as const },
+    transition: { type: "spring" as const, stiffness: 260, damping: 22 },
   },
   exit: {
     opacity: 0,
-    y: -14,
-    scale: 0.99,
-    transition: { duration: 0.22, ease: "easeIn" as const },
+    y: -18,
+    scale: 0.97,
+    transition: { duration: 0.2, ease: "easeIn" as const },
   },
 };
 
@@ -92,6 +94,8 @@ function HomeContent({ dbUser, isDevMode }: HomeContentProps) {
             >
               <PrayerTimesWidget />
               <DailyInspiration />
+              <DailyQuiz />
+              <LevelTestCard compact />
               <QiblaCompass />
             </motion.div>
           )}
@@ -106,6 +110,7 @@ function HomeContent({ dbUser, isDevMode }: HomeContentProps) {
               className="flex w-full flex-col items-center gap-5"
             >
               <ProfileCard dbUser={dbUser} isDevMode={isDevMode} />
+              <LevelTestCard compact />
               <CoinTransferForm sender={dbUser} isDevMode={isDevMode} />
             </motion.div>
           )}
