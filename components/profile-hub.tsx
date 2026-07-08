@@ -7,7 +7,9 @@ import { useEffect, useState } from "react";
 import { CoinTransferForm } from "@/components/coin-transfer-form";
 import { DiamondsBadge, GlobalChat } from "@/components/global-chat";
 import { LeagueLeaderboard } from "@/components/league-leaderboard";
+import { SupportCreator } from "@/components/support-creator";
 import { useTelegram } from "@/components/telegram-provider";
+import { APP_THEMES, useTheme } from "@/components/theme-provider";
 import {
   fetchAvatars,
   LEAGUE_LABELS,
@@ -23,6 +25,7 @@ interface ProfileHubProps {
 
 export function ProfileHub({ dbUser, isDevMode }: ProfileHubProps) {
   const { patchUser } = useTelegram();
+  const { themeId, setThemeId } = useTheme();
   const [avatars, setAvatars] = useState<UserAvatar[]>([]);
   const [name, setName] = useState(dbUser.display_name ?? dbUser.first_name);
   const [saving, setSaving] = useState(false);
@@ -150,6 +153,44 @@ export function ProfileHub({ dbUser, isDevMode }: ProfileHubProps) {
           </div>
         )}
       </motion.section>
+
+      <motion.section variants={staggerItem} className={`${cozyCardClass} max-w-sm px-4 py-4`}>
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--theme-text-muted)]">
+          Тема оформления
+        </p>
+        <div className="space-y-2">
+          {APP_THEMES.map((theme) => (
+            <motion.button
+              key={theme.id}
+              type="button"
+              onClick={() => setThemeId(theme.id)}
+              whileTap={{ scale: 0.95 }}
+              className={`flex w-full items-center gap-3 rounded-3xl border px-4 py-3 text-left ${
+                themeId === theme.id
+                  ? "border-emerald-400 bg-emerald-50/80 dark:bg-emerald-950/40"
+                  : "border-[var(--theme-border)] bg-[var(--theme-surface)]"
+              }`}
+            >
+              <span
+                className="h-10 w-10 shrink-0 rounded-full border border-white/60 shadow-inner"
+                style={{ background: theme.preview }}
+              />
+              <div>
+                <p className="text-sm font-semibold text-[var(--theme-text)]">
+                  {theme.label}
+                </p>
+                <p className="text-[10px] text-[var(--theme-text-muted)]">
+                  {theme.description}
+                </p>
+              </div>
+            </motion.button>
+          ))}
+        </div>
+      </motion.section>
+
+      <motion.div variants={staggerItem} className="w-full max-w-sm">
+        <SupportCreator />
+      </motion.div>
 
       <motion.div variants={staggerItem} className="w-full max-w-sm">
         <LeagueLeaderboard />

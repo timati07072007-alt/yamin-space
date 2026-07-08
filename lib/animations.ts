@@ -1,7 +1,7 @@
 import type { Variants } from "framer-motion";
 
 export const cozyCardClass =
-  "w-full max-w-sm overflow-hidden rounded-3xl border border-amber-900/10 bg-white/75 shadow-[0_20px_50px_-24px_rgba(146,104,41,0.35)] backdrop-blur-xl";
+  "w-full max-w-sm overflow-hidden rounded-3xl border border-[var(--theme-border)] bg-[var(--theme-surface)] shadow-[0_20px_50px_-24px_var(--theme-card-shadow)] backdrop-blur-xl";
 
 export const glassPanelClass =
   "rounded-3xl border border-white/60 bg-white/55 backdrop-blur-2xl shadow-[0_8px_32px_-12px_rgba(146,104,41,0.25)]";

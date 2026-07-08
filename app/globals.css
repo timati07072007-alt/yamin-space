@@ -1,8 +1,69 @@
 @import "tailwindcss";
 
-:root {
+/* ── Уютный Изумруд (default) ── */
+:root,
+[data-theme="emerald"] {
   --background: #faf6ee;
   --foreground: #44403c;
+  --theme-bg: #faf6ee;
+  --theme-surface: rgba(255, 255, 255, 0.75);
+  --theme-text: #44403c;
+  --theme-text-muted: #78716c;
+  --theme-border: rgba(120, 113, 108, 0.2);
+  --theme-accent-soft: rgba(209, 250, 229, 0.8);
+  --theme-accent-text: #065f46;
+  --theme-gold-text: #b45309;
+  --theme-muted: rgba(214, 211, 209, 0.7);
+  --theme-ring-track: rgba(16, 185, 129, 0.15);
+  --theme-card-shadow: rgba(146, 104, 41, 0.35);
+  --theme-body-gradient:
+    radial-gradient(56rem 40rem at 88% -10%, rgba(16, 185, 129, 0.14), transparent 60%),
+    radial-gradient(44rem 34rem at -14% 16%, rgba(217, 164, 65, 0.16), transparent 55%),
+    radial-gradient(30rem 24rem at 50% 100%, rgba(167, 139, 250, 0.08), transparent 50%),
+    linear-gradient(180deg, #fbf7ef 0%, #f8f2e7 55%, #f4ecdd 100%);
+}
+
+/* ── Ночной Сад ── */
+[data-theme="night"] {
+  --background: #0f172a;
+  --foreground: #e2e8f0;
+  --theme-bg: #0f172a;
+  --theme-surface: rgba(30, 41, 59, 0.85);
+  --theme-text: #e2e8f0;
+  --theme-text-muted: #94a3b8;
+  --theme-border: rgba(148, 163, 184, 0.2);
+  --theme-accent-soft: rgba(16, 185, 129, 0.12);
+  --theme-accent-text: #6ee7b7;
+  --theme-gold-text: #fcd34d;
+  --theme-muted: rgba(51, 65, 85, 0.8);
+  --theme-ring-track: rgba(16, 185, 129, 0.2);
+  --theme-card-shadow: rgba(0, 0, 0, 0.45);
+  --theme-body-gradient:
+    radial-gradient(50rem 36rem at 90% -8%, rgba(16, 185, 129, 0.08), transparent 55%),
+    radial-gradient(40rem 30rem at -10% 20%, rgba(99, 102, 241, 0.1), transparent 50%),
+    linear-gradient(180deg, #0f172a 0%, #1e293b 55%, #0f172a 100%);
+  color-scheme: dark;
+}
+
+/* ── Тёплое Золото ── */
+[data-theme="gold"] {
+  --background: #fef9ef;
+  --foreground: #57534e;
+  --theme-bg: #fef9ef;
+  --theme-surface: rgba(255, 251, 235, 0.9);
+  --theme-text: #57534e;
+  --theme-text-muted: #a8a29e;
+  --theme-border: rgba(217, 164, 65, 0.25);
+  --theme-accent-soft: rgba(254, 243, 199, 0.9);
+  --theme-accent-text: #92400e;
+  --theme-gold-text: #d97706;
+  --theme-muted: rgba(254, 215, 170, 0.5);
+  --theme-ring-track: rgba(217, 119, 6, 0.2);
+  --theme-card-shadow: rgba(180, 83, 9, 0.25);
+  --theme-body-gradient:
+    radial-gradient(52rem 38rem at 85% -5%, rgba(251, 191, 36, 0.18), transparent 55%),
+    radial-gradient(42rem 32rem at -12% 18%, rgba(254, 215, 170, 0.3), transparent 50%),
+    linear-gradient(180deg, #fffbeb 0%, #fef3c7 50%, #fde68a 100%);
 }
 
 @theme inline {
@@ -13,26 +74,11 @@
 }
 
 body {
-  background:
-    radial-gradient(
-      56rem 40rem at 88% -10%,
-      rgba(16, 185, 129, 0.14),
-      transparent 60%
-    ),
-    radial-gradient(
-      44rem 34rem at -14% 16%,
-      rgba(217, 164, 65, 0.16),
-      transparent 55%
-    ),
-    radial-gradient(
-      30rem 24rem at 50% 100%,
-      rgba(167, 139, 250, 0.08),
-      transparent 50%
-    ),
-    linear-gradient(180deg, #fbf7ef 0%, #f8f2e7 55%, #f4ecdd 100%);
+  background: var(--theme-body-gradient);
   background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  transition: background 0.4s ease, color 0.3s ease;
 }
 
 @keyframes cozy-breathe {
@@ -54,7 +100,11 @@ body {
   color: #064e3b;
 }
 
-/* Мягкое «дыхание» индикатора активного намаза */
+[data-theme="night"] ::selection {
+  background: rgba(16, 185, 129, 0.35);
+  color: #ecfdf5;
+}
+
 @keyframes cozy-pulse {
   0%,
   100% {
