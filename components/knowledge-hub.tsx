@@ -15,7 +15,7 @@ import { useState, type ComponentType } from "react";
 
 function SectionLoader() {
   return (
-    <div className="flex items-center justify-center gap-2 py-10 text-sm text-zinc-500">
+    <div className="flex items-center justify-center gap-2 py-10 text-sm text-stone-400">
       <Loader2 className="h-4 w-4 animate-spin" />
       Загрузка раздела...
     </div>
@@ -78,17 +78,19 @@ const SECTIONS: SectionConfig[] = [
   { id: "quiz", label: "Квиз", icon: BrainCircuit, searchable: false },
 ];
 
-const glassCard =
-  "w-full max-w-sm overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/40 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.8)] backdrop-blur-xl";
+const cozyCard =
+  "w-full max-w-sm overflow-hidden rounded-[2rem] border border-amber-900/10 bg-white/75 shadow-[0_20px_50px_-24px_rgba(146,104,41,0.35)] backdrop-blur-xl";
 
 function ArabicPlaceholder() {
   return (
     <div className="flex flex-col items-center gap-3 py-10 text-center">
-      <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-500/10 text-emerald-300">
+      <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-100/80 text-emerald-700">
         <Languages className="h-7 w-7" />
       </div>
-      <p className="text-sm font-medium text-zinc-200">Уроки арабского языка</p>
-      <p className="max-w-[16rem] text-xs leading-relaxed text-zinc-500">
+      <p className="text-sm font-medium text-stone-700">
+        Уроки арабского языка
+      </p>
+      <p className="max-w-[16rem] text-xs leading-relaxed text-stone-400">
         Раздел в разработке. Скоро здесь появятся интерактивные уроки алфавита,
         чтения и основ грамматики.
       </p>
@@ -108,8 +110,8 @@ export function KnowledgeHub() {
   }
 
   return (
-    <section className={glassCard}>
-      <div className="border-b border-white/5 px-4 pb-0 pt-4">
+    <section className={cozyCard}>
+      <div className="border-b border-stone-200/70 px-4 pb-0 pt-4">
         <div className="flex gap-1 overflow-x-auto pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {SECTIONS.map((item) => {
             const Icon = item.icon;
@@ -126,17 +128,17 @@ export function KnowledgeHub() {
                   <motion.span
                     layoutId="knowledge-active-pill"
                     transition={{ type: "spring", stiffness: 320, damping: 28 }}
-                    className="absolute inset-0 rounded-2xl border border-emerald-400/25 bg-emerald-500/15"
+                    className="absolute inset-0 rounded-2xl border border-emerald-200 bg-emerald-100/80"
                   />
                 )}
                 <Icon
                   className={`relative h-3.5 w-3.5 ${
-                    isActive ? "text-emerald-300" : "text-zinc-500"
+                    isActive ? "text-emerald-700" : "text-stone-400"
                   }`}
                 />
                 <span
                   className={`relative ${
-                    isActive ? "text-emerald-200" : "text-zinc-400"
+                    isActive ? "text-emerald-800" : "text-stone-500"
                   }`}
                 >
                   {item.label}
@@ -150,13 +152,13 @@ export function KnowledgeHub() {
       <div className="px-4 py-4">
         {section.searchable && (
           <div className="relative mb-4">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
             <input
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={section.searchPlaceholder}
-              className="w-full rounded-2xl border border-white/10 bg-white/5 py-2.5 pl-10 pr-4 text-sm text-zinc-100 placeholder-zinc-600 outline-none transition-all focus:border-emerald-400/40 focus:bg-white/[0.07] focus:ring-2 focus:ring-emerald-400/15"
+              className="w-full rounded-2xl border border-stone-200 bg-white/80 py-2.5 pl-10 pr-4 text-sm text-stone-700 placeholder-stone-400 outline-none transition-all focus:border-emerald-300 focus:bg-white focus:ring-2 focus:ring-emerald-200/60"
             />
           </div>
         )}

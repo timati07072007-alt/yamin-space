@@ -10,6 +10,7 @@ create table if not exists public.books (
   category_age text not null default 'adults'
     check (category_age in ('children', 'teens', 'adults')),
   content_url text,
+  content_text text,
   created_at timestamptz not null default now()
 );
 

@@ -7,6 +7,8 @@ export interface Book {
   description: string;
   category_age: BookAgeCategory;
   content_url: string | null;
+  /** Полный текст книги для встроенного ридера. */
+  content_text: string | null;
 }
 
 export type HadithAuthenticity = "sahih" | "hasan" | "daif";

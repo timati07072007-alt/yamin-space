@@ -11,9 +11,9 @@ import {
 } from "@/lib/knowledge";
 
 const AUTHENTICITY_STYLES: Record<Hadith["authenticity"], string> = {
-  sahih: "border-emerald-400/25 bg-emerald-500/10 text-emerald-300",
-  hasan: "border-amber-400/25 bg-amber-400/10 text-amber-300",
-  daif: "border-white/10 bg-white/5 text-zinc-400",
+  sahih: "border-emerald-300 bg-emerald-100/80 text-emerald-800",
+  hasan: "border-amber-300 bg-amber-100/80 text-amber-700",
+  daif: "border-stone-200 bg-stone-100 text-stone-500",
 };
 
 interface HadithSectionProps {
@@ -50,7 +50,7 @@ export function HadithSection({ query }: HadithSectionProps) {
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+      <div className="rounded-3xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
         {error}
       </div>
     );
@@ -58,7 +58,7 @@ export function HadithSection({ query }: HadithSectionProps) {
 
   if (!hadiths) {
     return (
-      <div className="flex items-center justify-center gap-2 py-10 text-sm text-zinc-500">
+      <div className="flex items-center justify-center gap-2 py-10 text-sm text-stone-400">
         <Loader2 className="h-4 w-4 animate-spin" />
         Загружаем хадисы...
       </div>
@@ -77,7 +77,7 @@ export function HadithSection({ query }: HadithSectionProps) {
 
   if (filtered.length === 0) {
     return (
-      <p className="py-8 text-center text-sm text-zinc-500">
+      <p className="py-8 text-center text-sm text-stone-400">
         Ничего не найдено
       </p>
     );
@@ -91,18 +91,18 @@ export function HadithSection({ query }: HadithSectionProps) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: Math.min(index * 0.04, 0.3) }}
-          className="rounded-2xl border border-white/5 bg-white/5 px-4 py-3.5"
+          className="rounded-3xl border border-stone-200/80 bg-white/70 px-4 py-3.5"
         >
           <div className="flex items-start gap-2.5">
-            <ScrollText className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400/70" />
-            <p className="text-sm leading-relaxed text-zinc-200">
+            <ScrollText className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600/80" />
+            <p className="text-sm leading-relaxed text-stone-700">
               «{hadith.text_ru}»
             </p>
           </div>
-          <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-white/5 pt-2.5">
-            <span className="text-xs text-zinc-400">{hadith.author}</span>
-            <span className="text-xs text-zinc-600">·</span>
-            <span className="text-xs text-zinc-500">{hadith.collection}</span>
+          <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-stone-200/70 pt-2.5">
+            <span className="text-xs text-stone-500">{hadith.author}</span>
+            <span className="text-xs text-stone-300">·</span>
+            <span className="text-xs text-stone-400">{hadith.collection}</span>
             <span
               className={`ml-auto rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${AUTHENTICITY_STYLES[hadith.authenticity]}`}
             >

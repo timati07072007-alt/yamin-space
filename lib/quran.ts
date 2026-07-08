@@ -4,6 +4,8 @@
  * - аудио сур (mp3, чтец Мишари Рашид аль-Афаси): server8.mp3quran.net
  */
 
+import { latinToRussianTranscription } from "@/lib/transliteration";
+
 const QURAN_API_BASE = "https://api.alquran.cloud/v1";
 const AUDIO_BASE = "https://server8.mp3quran.net/afs";
 
@@ -11,6 +13,8 @@ const AUDIO_BASE = "https://server8.mp3quran.net/afs";
 const RU_EDITION = "ru.kuliev";
 /** Каноничный арабский текст (Усмани). */
 const AR_EDITION = "quran-uthmani";
+/** Латинская транслитерация — конвертируется в русскую транскрипцию. */
+const TRANSLIT_EDITION = "en.transliteration";
 
 export interface Surah {
   number: number;
@@ -24,6 +28,8 @@ export interface Surah {
 export interface SurahAyah {
   numberInSurah: number;
   arabic: string;
+  /** Русская транскрипция произношения. */
+  transcription: string;
   russian: string;
 }
 
@@ -90,18 +96,21 @@ export async function fetchSurahContent(
   surahNumber: number,
 ): Promise<SurahContent> {
   const data = await quranApi<Array<{ ayahs: ApiAyahRaw[] }>>(
-    `/surah/${surahNumber}/editions/${AR_EDITION},${RU_EDITION}`,
+    `/surah/${surahNumber}/editions/${AR_EDITION},${TRANSLIT_EDITION},${RU_EDITION}`,
   );
 
-  const [arabicEdition, russianEdition] = data;
+  const [arabicEdition, translitEdition, russianEdition] = data;
 
-  if (!arabicEdition || !russianEdition) {
+  if (!arabicEdition || !translitEdition || !russianEdition) {
     throw new Error("Quran API: неполные данные изданий");
   }
 
   const ayahs: SurahAyah[] = arabicEdition.ayahs.map((ayah, index) => ({
     numberInSurah: ayah.numberInSurah,
     arabic: ayah.text,
+    transcription: latinToRussianTranscription(
+      translitEdition.ayahs[index]?.text ?? "",
+    ),
     russian: russianEdition.ayahs[index]?.text ?? "",
   }));
 

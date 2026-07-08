@@ -107,12 +107,12 @@ function SurahAudioPlayer({ surahNumber }: { surahNumber: number }) {
   }, []);
 
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3">
+    <div className="flex items-center gap-3 rounded-3xl border border-emerald-200 bg-emerald-50/80 px-4 py-3">
       <motion.button
         type="button"
         onClick={() => void togglePlayback()}
         whileTap={{ scale: 0.92 }}
-        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-emerald-950 shadow-[0_0_24px_-4px_rgba(16,185,129,0.7)]"
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white shadow-[0_8px_20px_-6px_rgba(16,185,129,0.6)]"
       >
         {isBuffering ? (
           <Loader2 className="h-5 w-5 animate-spin" />
@@ -131,9 +131,9 @@ function SurahAudioPlayer({ surahNumber }: { surahNumber: number }) {
           step={1}
           value={currentTime}
           onChange={(event) => seek(Number(event.target.value))}
-          className="h-1 w-full cursor-pointer appearance-none rounded-full bg-white/15 accent-emerald-400"
+          className="h-1 w-full cursor-pointer appearance-none rounded-full bg-emerald-200/80 accent-emerald-600"
         />
-        <div className="mt-1 flex justify-between text-[10px] text-zinc-500 tabular-nums">
+        <div className="mt-1 flex justify-between text-[10px] text-stone-400 tabular-nums">
           <span>{formatAudioTime(currentTime)}</span>
           <span>{duration ? formatAudioTime(duration) : "--:--"}</span>
         </div>
@@ -186,15 +186,17 @@ function SurahReader({
       <button
         type="button"
         onClick={onBack}
-        className="mb-3 flex items-center gap-1.5 text-xs font-medium text-emerald-300 transition-colors hover:text-emerald-200"
+        className="mb-3 flex items-center gap-1.5 text-xs font-medium text-emerald-700 transition-colors hover:text-emerald-600"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
         Все суры
       </button>
 
       <div className="mb-4 text-center">
-        <p className="text-2xl font-semibold text-zinc-50">{surah.arabicName}</p>
-        <p className="mt-1 text-sm text-zinc-400">
+        <p className="text-2xl font-semibold text-stone-800">
+          {surah.arabicName}
+        </p>
+        <p className="mt-1 text-sm text-stone-500">
           {surah.number}. {surah.englishName} · {surah.ayahCount} аятов
         </p>
       </div>
@@ -203,13 +205,13 @@ function SurahReader({
 
       <div className="mt-4">
         {error && (
-          <div className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          <div className="rounded-3xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
             {error}
           </div>
         )}
 
         {!content && !error && (
-          <div className="flex items-center justify-center gap-2 py-10 text-sm text-zinc-500">
+          <div className="flex items-center justify-center gap-2 py-10 text-sm text-stone-400">
             <Loader2 className="h-4 w-4 animate-spin" />
             Загружаем текст суры...
           </div>
@@ -220,17 +222,20 @@ function SurahReader({
             {content.ayahs.map((ayah) => (
               <li
                 key={ayah.numberInSurah}
-                className="rounded-2xl border border-white/5 bg-white/5 px-4 py-3.5"
+                className="rounded-3xl border border-stone-200/80 bg-white/70 px-4 py-3.5"
               >
                 <p
                   dir="rtl"
                   lang="ar"
-                  className="text-right text-xl leading-loose text-zinc-100"
+                  className="text-right text-xl leading-loose text-stone-800"
                 >
                   {ayah.arabic}
                 </p>
-                <p className="mt-2 border-t border-white/5 pt-2 text-sm leading-relaxed text-zinc-400">
-                  <span className="mr-1.5 text-xs font-semibold text-emerald-400/80 tabular-nums">
+                <p className="mt-2 border-t border-stone-200/70 pt-2 text-sm italic leading-relaxed text-emerald-800/90">
+                  {ayah.transcription}
+                </p>
+                <p className="mt-2 border-t border-stone-200/70 pt-2 text-sm leading-relaxed text-stone-600">
+                  <span className="mr-1.5 text-xs font-semibold text-emerald-600 tabular-nums">
                     {ayah.numberInSurah}.
                   </span>
                   {ayah.russian}
@@ -275,7 +280,7 @@ export function QuranSection({ query }: QuranSectionProps) {
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+      <div className="rounded-3xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
         {error}
       </div>
     );
@@ -283,7 +288,7 @@ export function QuranSection({ query }: QuranSectionProps) {
 
   if (!surahs) {
     return (
-      <div className="flex items-center justify-center gap-2 py-10 text-sm text-zinc-500">
+      <div className="flex items-center justify-center gap-2 py-10 text-sm text-stone-400">
         <Loader2 className="h-4 w-4 animate-spin" />
         Загружаем список сур...
       </div>
@@ -319,7 +324,7 @@ export function QuranSection({ query }: QuranSectionProps) {
           className="max-h-[26rem] space-y-1.5 overflow-y-auto pr-1"
         >
           {filtered.length === 0 && (
-            <li className="py-8 text-center text-sm text-zinc-500">
+            <li className="py-8 text-center text-sm text-stone-400">
               Ничего не найдено
             </li>
           )}
@@ -328,20 +333,20 @@ export function QuranSection({ query }: QuranSectionProps) {
               <button
                 type="button"
                 onClick={() => setActiveSurah(surah)}
-                className="flex w-full items-center gap-3 rounded-2xl border border-white/5 bg-white/5 px-3.5 py-2.5 text-left transition-colors hover:border-emerald-400/25 hover:bg-emerald-500/10"
+                className="flex w-full items-center gap-3 rounded-3xl border border-stone-200/80 bg-white/70 px-3.5 py-2.5 text-left transition-colors hover:border-emerald-300 hover:bg-emerald-50"
               >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-xs font-semibold text-emerald-300 tabular-nums">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-100/80 text-xs font-semibold text-emerald-700 tabular-nums">
                   {surah.number}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium text-zinc-200">
+                  <span className="block truncate text-sm font-medium text-stone-700">
                     {surah.englishName}
                   </span>
-                  <span className="block truncate text-xs text-zinc-500">
+                  <span className="block truncate text-xs text-stone-400">
                     {surah.translationName} · {surah.ayahCount} аятов
                   </span>
                 </span>
-                <span className="shrink-0 text-lg text-zinc-300" lang="ar">
+                <span className="shrink-0 text-lg text-stone-600" lang="ar">
                   {surah.arabicName}
                 </span>
               </button>

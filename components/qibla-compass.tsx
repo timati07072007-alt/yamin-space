@@ -12,8 +12,8 @@ import {
   type GeoPoint,
 } from "@/lib/qibla";
 
-const glassCard =
-  "w-full max-w-sm overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/40 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.8)] backdrop-blur-xl";
+const cozyCard =
+  "w-full max-w-sm overflow-hidden rounded-[2rem] border border-amber-900/10 bg-white/75 shadow-[0_20px_50px_-24px_rgba(146,104,41,0.35)] backdrop-blur-xl";
 
 const DIAL_DEGREES = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
 
@@ -24,10 +24,6 @@ const CARDINAL_LABELS: Record<number, string> = {
   270: "З",
 };
 
-/**
- * Пружинное вращение с разворотом угла в непрерывную величину,
- * чтобы стрелка не делала полный оборот при переходе через 359° → 0°.
- */
 function useSpringAngle(target: number): MotionValue<number> {
   const rotation = useSpring(target, {
     stiffness: 55,
@@ -75,9 +71,6 @@ export function QiblaCompass() {
   );
 
   const deviceHeading = heading ?? 0;
-
-  // Лимб вращается против курса устройства, стрелка Киблы — на азимут Киблы
-  // относительно текущего направления телефона.
   const dialRotation = useSpringAngle(-deviceHeading);
   const needleRotation = useSpringAngle(qiblaBearing - deviceHeading);
 
@@ -85,23 +78,23 @@ export function QiblaCompass() {
   const isAligned = isActive && (relativeAngle <= 5 || relativeAngle >= 355);
 
   return (
-    <section className={glassCard}>
-      <div className="flex items-center gap-3 border-b border-white/5 px-5 py-4">
-        <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-500/10 text-emerald-300">
+    <section className={cozyCard}>
+      <div className="flex items-center gap-3 border-b border-stone-200/70 px-5 py-4">
+        <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-100/80 text-emerald-700">
           <Compass className="h-5 w-5" />
         </div>
         <div className="flex-1">
-          <h2 className="text-sm font-semibold tracking-wide text-zinc-100">
+          <h2 className="text-sm font-semibold tracking-wide text-stone-700">
             Компас Киблы
           </h2>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-stone-400">
             {isCustomLocation ? "По вашей геопозиции" : "Бишкек (по умолчанию)"}
             {" · "}
             {Math.round(qiblaBearing)}° от севера
           </p>
         </div>
         {isCustomLocation && (
-          <LocateFixed className="h-4 w-4 text-emerald-400/70" />
+          <LocateFixed className="h-4 w-4 text-emerald-600/80" />
         )}
       </div>
 
@@ -109,7 +102,7 @@ export function QiblaCompass() {
         <div className="relative h-64 w-64">
           <motion.div
             style={{ rotate: dialRotation }}
-            className="absolute inset-0 rounded-full border border-white/10 bg-white/[0.03]"
+            className="absolute inset-0 rounded-full border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-amber-50 shadow-inner"
           >
             {DIAL_DEGREES.map((degree) => {
               const label = CARDINAL_LABELS[degree];
@@ -123,14 +116,14 @@ export function QiblaCompass() {
                   <div
                     className={`absolute left-1/2 top-2 -translate-x-1/2 ${
                       label
-                        ? "h-3.5 w-0.5 bg-emerald-300/80"
-                        : "h-2.5 w-px bg-white/25"
+                        ? "h-3.5 w-0.5 bg-emerald-400/80"
+                        : "h-2.5 w-px bg-stone-300/60"
                     }`}
                   />
                   {label ? (
                     <span
                       className={`absolute left-1/2 top-7 -translate-x-1/2 text-xs font-semibold ${
-                        degree === 0 ? "text-emerald-300" : "text-zinc-400"
+                        degree === 0 ? "text-emerald-700" : "text-stone-400"
                       }`}
                       style={{ transform: `translateX(-50%) rotate(${-degree}deg)` }}
                     >
@@ -138,7 +131,7 @@ export function QiblaCompass() {
                     </span>
                   ) : (
                     <span
-                      className="absolute left-1/2 top-6 -translate-x-1/2 text-[9px] text-zinc-600 tabular-nums"
+                      className="absolute left-1/2 top-6 -translate-x-1/2 text-[9px] text-stone-300 tabular-nums"
                       style={{ transform: `translateX(-50%) rotate(${-degree}deg)` }}
                     >
                       {degree}
@@ -154,13 +147,13 @@ export function QiblaCompass() {
               <div
                 className={`h-24 w-1.5 rounded-full bg-gradient-to-t transition-colors duration-300 ${
                   isAligned
-                    ? "from-emerald-500/40 to-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.6)]"
-                    : "from-amber-500/40 to-amber-300"
+                    ? "from-emerald-400/50 to-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.45)]"
+                    : "from-amber-300/50 to-amber-500"
                 }`}
               />
               <div
                 className={`absolute -top-1.5 left-1/2 h-0 w-0 -translate-x-1/2 border-x-[7px] border-b-[12px] border-x-transparent transition-colors duration-300 ${
-                  isAligned ? "border-b-emerald-300" : "border-b-amber-300"
+                  isAligned ? "border-b-emerald-500" : "border-b-amber-500"
                 }`}
               />
             </div>
@@ -169,8 +162,8 @@ export function QiblaCompass() {
           <div
             className={`absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 transition-colors duration-300 ${
               isAligned
-                ? "border-emerald-300 bg-emerald-500/50"
-                : "border-white/40 bg-zinc-800"
+                ? "border-emerald-500 bg-emerald-400/60 animate-cozy-pulse"
+                : "border-stone-300 bg-white"
             }`}
           />
         </div>
@@ -178,10 +171,10 @@ export function QiblaCompass() {
         <div className="mt-5 w-full">
           {permission === "granted" && isActive ? (
             <div
-              className={`rounded-2xl border px-4 py-3 text-center text-sm transition-colors duration-300 ${
+              className={`rounded-3xl border px-4 py-3 text-center text-sm transition-colors duration-300 ${
                 isAligned
-                  ? "border-emerald-400/40 bg-emerald-500/15 font-semibold text-emerald-200"
-                  : "border-white/5 bg-white/5 text-zinc-400"
+                  ? "border-emerald-200 bg-emerald-50 font-semibold text-emerald-800"
+                  : "border-stone-200 bg-stone-50 text-stone-500"
               }`}
             >
               {isAligned
@@ -189,17 +182,17 @@ export function QiblaCompass() {
                 : `Поверните телефон: Кибла в ${Math.round(relativeAngle)}°`}
             </div>
           ) : permission === "granted" && !isActive ? (
-            <p className="text-center text-xs text-zinc-500">
+            <p className="text-center text-xs text-stone-400">
               Ждём данные сенсора... Поводите телефоном восьмёркой для
               калибровки.
             </p>
           ) : permission === "denied" ? (
-            <p className="text-center text-xs text-red-400/80">
+            <p className="text-center text-xs text-red-500">
               Доступ к датчикам отклонён. Разрешите доступ к движению в
               настройках браузера.
             </p>
           ) : permission === "unsupported" ? (
-            <p className="text-center text-xs text-zinc-500">
+            <p className="text-center text-xs text-stone-400">
               Датчик ориентации недоступен. Стрелка показывает азимут Киблы
               ({Math.round(qiblaBearing)}°) от севера.
             </p>
@@ -210,7 +203,7 @@ export function QiblaCompass() {
               disabled={permission === "requesting"}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl border border-emerald-400/25 bg-gradient-to-r from-emerald-500/80 to-emerald-600/80 px-4 py-3.5 text-sm font-semibold text-emerald-50 shadow-[0_8px_32px_-8px_rgba(16,185,129,0.5)] transition-colors hover:from-emerald-500 hover:to-emerald-600 disabled:opacity-60"
+              className="flex w-full items-center justify-center gap-2 rounded-3xl border border-emerald-300 bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 py-3.5 text-sm font-semibold text-white shadow-[0_8px_24px_-8px_rgba(16,185,129,0.5)] transition-colors hover:from-emerald-500 hover:to-emerald-600 disabled:opacity-60"
             >
               <Navigation className="h-4 w-4" />
               {permission === "requesting"

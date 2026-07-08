@@ -6,7 +6,9 @@ export async function GET() {
 
     const { data, error } = await supabase
       .from("books")
-      .select("id, title, author, description, category_age, content_url")
+      .select(
+        "id, title, author, description, category_age, content_url, content_text",
+      )
       .order("id", { ascending: true });
 
     if (error) {

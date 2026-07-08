@@ -19,8 +19,11 @@ const DEV_MOCK_RECEIVER_ID = 999_000_001;
 const DEV_MOCK_RECEIVER_NAME = "MOCK-получатель";
 const SIMULATION_DELAY_MS = 900;
 
+const cozyCard =
+  "w-full max-w-sm overflow-hidden rounded-[2rem] border border-amber-900/10 bg-white/75 shadow-[0_20px_50px_-24px_rgba(146,104,41,0.35)] backdrop-blur-xl";
+
 const inputClass =
-  "w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-600 outline-none transition-all focus:border-emerald-400/40 focus:bg-white/[0.07] focus:ring-2 focus:ring-emerald-400/15 disabled:cursor-not-allowed disabled:opacity-50";
+  "w-full rounded-2xl border border-stone-200 bg-white/80 px-4 py-3 text-sm text-stone-700 placeholder-stone-400 outline-none transition-all focus:border-emerald-300 focus:bg-white focus:ring-2 focus:ring-emerald-200/60 disabled:cursor-not-allowed disabled:opacity-50";
 
 interface CoinTransferFormProps {
   sender: DbUser;
@@ -100,16 +103,16 @@ export function CoinTransferForm({ sender, isDevMode }: CoinTransferFormProps) {
   }
 
   return (
-    <section className="w-full max-w-sm overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/40 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.8)] backdrop-blur-xl">
-      <div className="flex items-center gap-3 border-b border-white/5 px-5 py-4">
-        <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-amber-400/20 bg-amber-400/10 text-amber-300">
+    <section className={cozyCard}>
+      <div className="flex items-center gap-3 border-b border-stone-200/70 px-5 py-4">
+        <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-amber-200 bg-amber-100/80 text-amber-700">
           <HandCoins className="h-5 w-5" />
         </div>
         <div>
-          <h2 className="text-sm font-semibold tracking-wide text-zinc-100">
+          <h2 className="text-sm font-semibold tracking-wide text-stone-700">
             Поделиться савабом
           </h2>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-stone-400">
             Максимум 50 монет одному человеку в сутки
           </p>
         </div>
@@ -117,7 +120,7 @@ export function CoinTransferForm({ sender, isDevMode }: CoinTransferFormProps) {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 px-5 py-5">
         <label className="flex flex-col gap-1.5">
-          <span className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+          <span className="text-xs font-medium uppercase tracking-wider text-stone-400">
             ID получателя
           </span>
           <input
@@ -130,14 +133,14 @@ export function CoinTransferForm({ sender, isDevMode }: CoinTransferFormProps) {
             className={inputClass}
           />
           {isDevMode && (
-            <span className="text-xs text-amber-400/80">
+            <span className="text-xs text-amber-600">
               DEV-режим: получатель зафиксирован на {DEV_MOCK_RECEIVER_NAME}
             </span>
           )}
         </label>
 
         <label className="flex flex-col gap-1.5">
-          <span className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+          <span className="text-xs font-medium uppercase tracking-wider text-stone-400">
             Количество монет
           </span>
           <input
@@ -154,7 +157,7 @@ export function CoinTransferForm({ sender, isDevMode }: CoinTransferFormProps) {
 
         {isDevMode && (
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+            <span className="text-xs font-medium uppercase tracking-wider text-stone-400">
               DEV: симуляция результата
             </span>
             <select
@@ -163,7 +166,7 @@ export function CoinTransferForm({ sender, isDevMode }: CoinTransferFormProps) {
                 setDevOutcome(event.target.value as DevOutcome)
               }
               disabled={isLoading}
-              className={`${inputClass} appearance-none [&>option]:bg-zinc-900`}
+              className={`${inputClass} appearance-none`}
             >
               <option value="success">Успешный перевод</option>
               <option value="limit">Ошибка: превышен лимит</option>
@@ -176,7 +179,7 @@ export function CoinTransferForm({ sender, isDevMode }: CoinTransferFormProps) {
           disabled={isLoading}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="flex items-center justify-center gap-2 rounded-2xl border border-emerald-400/25 bg-gradient-to-r from-emerald-500/80 to-emerald-600/80 px-4 py-3.5 text-sm font-semibold text-emerald-50 shadow-[0_8px_32px_-8px_rgba(16,185,129,0.5)] transition-colors hover:from-emerald-500 hover:to-emerald-600 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex items-center justify-center gap-2 rounded-3xl border border-emerald-300 bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 py-3.5 text-sm font-semibold text-white shadow-[0_8px_24px_-8px_rgba(16,185,129,0.5)] transition-colors hover:from-emerald-500 hover:to-emerald-600 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isLoading ? (
             <>
@@ -199,7 +202,7 @@ export function CoinTransferForm({ sender, isDevMode }: CoinTransferFormProps) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.25 }}
-              className="flex items-start gap-2 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300"
+              className="flex items-start gap-2 rounded-3xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
             >
               <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
               <span>{message}</span>
@@ -213,7 +216,7 @@ export function CoinTransferForm({ sender, isDevMode }: CoinTransferFormProps) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.25 }}
-              className="flex items-start gap-2 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-300"
+              className="flex items-start gap-2 rounded-3xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
             >
               <XCircle className="mt-0.5 h-4 w-4 shrink-0" />
               <span>{message}</span>

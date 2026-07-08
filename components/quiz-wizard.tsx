@@ -50,7 +50,7 @@ const DIFFICULTY_LABELS: Record<Quiz["difficulty"], string> = {
 };
 
 const glassCard =
-  "w-full max-w-sm overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/40 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.8)] backdrop-blur-xl";
+  "w-full max-w-sm overflow-hidden rounded-[2rem] border border-amber-900/10 bg-white/75 shadow-[0_20px_50px_-24px_rgba(146,104,41,0.35)] backdrop-blur-xl";
 
 function useCountUp(target: number, durationMs: number): number {
   const [value, setValue] = useState(0);
@@ -234,15 +234,15 @@ export function QuizWizard() {
 
   return (
     <section className={glassCard}>
-      <div className="flex items-center gap-3 border-b border-white/5 px-5 py-4">
-        <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-500/10 text-emerald-300">
+      <div className="flex items-center gap-3 border-b border-stone-200/70 px-5 py-4">
+        <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-100/80 text-emerald-700">
           <BookOpen className="h-5 w-5" />
         </div>
         <div>
-          <h2 className="text-sm font-semibold tracking-wide text-zinc-100">
+          <h2 className="text-sm font-semibold tracking-wide text-stone-700">
             Викторина
           </h2>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-stone-400">
             Отвечай на вопросы — получай XP и монеты
           </p>
         </div>
@@ -250,7 +250,7 @@ export function QuizWizard() {
 
       <div className="px-5 py-5">
         {loadError && (
-          <div className="mb-4 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          <div className="mb-4 rounded-3xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
             {loadError}
           </div>
         )}
@@ -265,7 +265,7 @@ export function QuizWizard() {
               transition={{ duration: 0.3 }}
             >
               {!quizzes ? (
-                <div className="flex items-center justify-center gap-2 py-8 text-sm text-zinc-500">
+                <div className="flex items-center justify-center gap-2 py-8 text-sm text-stone-400">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Загружаем темы...
                 </div>
@@ -278,17 +278,17 @@ export function QuizWizard() {
                         onClick={() => void startQuiz(quiz)}
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.99 }}
-                        className="flex w-full items-center justify-between rounded-2xl border border-white/5 bg-white/5 px-4 py-3.5 text-left transition-colors hover:border-emerald-400/25 hover:bg-emerald-500/10"
+                        className="flex w-full items-center justify-between rounded-3xl border border-stone-200/80 bg-white/70 px-4 py-3.5 text-left transition-colors hover:border-emerald-300 hover:bg-emerald-50"
                       >
                         <span>
-                          <span className="block text-sm font-medium text-zinc-100">
+                          <span className="block text-sm font-medium text-stone-700">
                             {quiz.title}
                           </span>
-                          <span className="mt-0.5 block text-xs text-zinc-500">
+                          <span className="mt-0.5 block text-xs text-stone-400">
                             {quiz.category} · {DIFFICULTY_LABELS[quiz.difficulty]}
                           </span>
                         </span>
-                        <ChevronRight className="h-4 w-4 shrink-0 text-zinc-500" />
+                        <ChevronRight className="h-4 w-4 shrink-0 text-stone-400" />
                       </motion.button>
                     </li>
                   ))}
@@ -306,25 +306,25 @@ export function QuizWizard() {
               transition={{ duration: 0.3 }}
             >
               <div className="mb-4">
-                <div className="flex items-center justify-between text-xs text-zinc-500">
+                <div className="flex items-center justify-between text-xs text-stone-400">
                   <span>{activeQuiz.title}</span>
                   <span className="tabular-nums">
                     {questionIndex + 1} из {questions.length}
                   </span>
                 </div>
-                <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-stone-200/70">
                   <motion.div
                     initial={false}
                     animate={{
                       width: `${((questionIndex + (answerState === "revealed" ? 1 : 0)) / questions.length) * 100}%`,
                     }}
                     transition={{ duration: 0.4, ease: "easeOut" }}
-                    className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-amber-300"
+                    className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-amber-400"
                   />
                 </div>
               </div>
 
-              <p className="mb-4 text-base font-medium leading-snug text-zinc-100">
+              <p className="mb-4 text-base font-medium leading-snug text-stone-800">
                 {question.question_text}
               </p>
 
@@ -342,15 +342,15 @@ export function QuizWizard() {
                     !lastResult.correct;
 
                   let optionClass =
-                    "border-white/5 bg-white/5 text-zinc-200 hover:border-emerald-400/25 hover:bg-emerald-500/10";
+                    "border-stone-200/80 bg-white/70 text-stone-700 hover:border-emerald-300 hover:bg-emerald-50";
 
                   if (isCorrectOption) {
                     optionClass =
-                      "border-emerald-400/40 bg-emerald-500/20 text-emerald-100";
+                      "border-emerald-300 bg-emerald-100/80 text-emerald-800";
                   } else if (isWrongSelection) {
-                    optionClass = "border-red-400/40 bg-red-500/20 text-red-200";
+                    optionClass = "border-red-300 bg-red-50 text-red-700";
                   } else if (answerState === "revealed") {
-                    optionClass = "border-white/5 bg-white/5 text-zinc-500";
+                    optionClass = "border-stone-200 bg-stone-50 text-stone-400";
                   }
 
                   return (
@@ -401,7 +401,7 @@ export function QuizWizard() {
                     className="mt-4"
                   >
                     {lastResult.alreadyAnswered && (
-                      <p className="mb-2 text-xs text-amber-300/80">
+                      <p className="mb-2 text-xs text-amber-600">
                         Ты уже отвечал на этот вопрос — награда не начисляется.
                       </p>
                     )}
@@ -410,7 +410,7 @@ export function QuizWizard() {
                       onClick={goNext}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className="flex w-full items-center justify-center gap-2 rounded-2xl border border-emerald-400/25 bg-gradient-to-r from-emerald-500/80 to-emerald-600/80 px-4 py-3 text-sm font-semibold text-emerald-50 transition-colors hover:from-emerald-500 hover:to-emerald-600"
+                      className="flex w-full items-center justify-center gap-2 rounded-3xl border border-emerald-300 bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:from-emerald-500 hover:to-emerald-600"
                     >
                       {questionIndex + 1 >= questions.length
                         ? "К результатам"
@@ -474,38 +474,38 @@ function ResultsScreen({
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.1 }}
-        className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-amber-400/30 bg-amber-400/10 text-amber-300"
+        className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-amber-200 bg-amber-100/80 text-amber-600"
       >
         <Award className="h-8 w-8" />
       </motion.div>
 
-      <h3 className="mt-4 text-lg font-semibold text-zinc-50">
+      <h3 className="mt-4 text-lg font-semibold text-stone-800">
         Викторина пройдена!
       </h3>
-      <p className="mt-1 text-sm text-zinc-500">
+      <p className="mt-1 text-sm text-stone-500">
         Правильных ответов: {progress.correctCount} из {totalQuestions}
       </p>
 
       <div className="mt-5 grid grid-cols-2 gap-3">
-        <div className="rounded-2xl border border-white/5 bg-white/5 p-4">
-          <div className="mb-1 flex items-center justify-center gap-1.5 text-emerald-300">
+        <div className="rounded-3xl border border-emerald-100 bg-emerald-50/70 p-4">
+          <div className="mb-1 flex items-center justify-center gap-1.5 text-emerald-700">
             <Sparkles className="h-4 w-4" />
             <span className="text-xs font-medium uppercase tracking-wider">
               XP
             </span>
           </div>
-          <p className="text-2xl font-semibold text-zinc-50 tabular-nums">
+          <p className="text-2xl font-semibold text-stone-800 tabular-nums">
             +{animatedXp}
           </p>
         </div>
-        <div className="rounded-2xl border border-white/5 bg-white/5 p-4">
-          <div className="mb-1 flex items-center justify-center gap-1.5 text-amber-300">
+        <div className="rounded-3xl border border-amber-100 bg-amber-50/70 p-4">
+          <div className="mb-1 flex items-center justify-center gap-1.5 text-amber-600">
             <Coins className="h-4 w-4" />
             <span className="text-xs font-medium uppercase tracking-wider">
               Монеты
             </span>
           </div>
-          <p className="text-2xl font-semibold text-zinc-50 tabular-nums">
+          <p className="text-2xl font-semibold text-stone-800 tabular-nums">
             +{animatedCoins}
           </p>
         </div>
@@ -519,7 +519,7 @@ function ResultsScreen({
             disabled={isClaiming}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl border border-amber-400/30 bg-gradient-to-r from-amber-500/80 to-amber-600/80 px-4 py-3.5 text-sm font-semibold text-amber-50 shadow-[0_8px_32px_-8px_rgba(245,158,11,0.5)] transition-colors hover:from-amber-500 hover:to-amber-600 disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-3xl border border-amber-300 bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-3.5 text-sm font-semibold text-white shadow-[0_8px_24px_-8px_rgba(245,158,11,0.45)] transition-colors hover:from-amber-500 hover:to-amber-600 disabled:opacity-60"
           >
             {isClaiming ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -534,7 +534,7 @@ function ResultsScreen({
           <motion.p
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300"
+            className="rounded-3xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
           >
             Награда зачислена на баланс!
           </motion.p>
@@ -545,7 +545,7 @@ function ResultsScreen({
           onClick={onRestart}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10"
+          className="flex w-full items-center justify-center gap-2 rounded-3xl border border-stone-200 bg-white/80 px-4 py-3 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-50"
         >
           <RotateCcw className="h-4 w-4" />
           Выбрать другую тему

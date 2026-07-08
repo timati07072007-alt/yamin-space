@@ -1,5 +1,5 @@
 import {
-  CalculationMethod,
+  CalculationParameters,
   Coordinates,
   Madhab,
   PrayerTimes,
@@ -60,12 +60,23 @@ const BISHKEK_UTC_OFFSET_HOURS = 6;
 const BISHKEK_COORDINATES = new Coordinates(42.8746, 74.5698);
 
 /**
- * Метод Университета Карачи (18°/18°) с ханафитским асром — стандарт,
- * которого придерживается Духовное управление мусульман Кыргызстана.
+ * Параметры откалиброваны по официальному календарю Духовного управления
+ * мусульман Кыргызстана (muftiyat.kg/ru/api/v1/calendar/1/):
+ * - Фаджр 18°, Иша 16°, ханафитский аср;
+ * - Магриб = закат + 7 минут (запас на ифтар, как в календаре муфтията);
+ * - минутные поправки сверены на зимних и летних датах, отклонение ≤ 1 мин.
  */
 const BISHKEK_CALCULATION = (() => {
-  const params = CalculationMethod.Karachi();
+  const params = new CalculationParameters(null, 18, 16);
   params.madhab = Madhab.Hanafi;
+  params.adjustments = {
+    fajr: -1,
+    sunrise: -1,
+    dhuhr: -1,
+    asr: 1,
+    maghrib: 7,
+    isha: 0,
+  };
   return params;
 })();
 
