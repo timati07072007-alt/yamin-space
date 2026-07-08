@@ -91,6 +91,7 @@ export async function POST(request: Request) {
     const total = breakdown.length;
     const title = resolveKnowledgeTitle(score, total);
     const { xpAwarded, coinsAwarded } = calcLevelTestRewards(score);
+    const diamondBonus = score >= 8 ? 1 : 0;
 
     const { data: userData, error: userError } = await supabase
       .from("users")
@@ -128,12 +129,29 @@ export async function POST(request: Request) {
       throw new Error(updateError.message);
     }
 
+    const diamondsGranted = diamondBonus;
+
+    if (diamondBonus > 0) {
+      const { data: bal } = await supabase
+        .from("diamonds_balance")
+        .select("balance")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      await supabase.from("diamonds_balance").upsert({
+        user_id: userId,
+        balance: (bal?.balance as number | undefined ?? 0) + diamondBonus,
+        updated_at: new Date().toISOString(),
+      });
+    }
+
     return Response.json({
       score,
       total,
       title,
       xpAwarded,
       coinsAwarded,
+      diamondsGranted,
       breakdown,
     });
   } catch (error) {

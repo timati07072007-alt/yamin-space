@@ -1,9 +1,18 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { BookMarked, BookOpen, ExternalLink, Loader2, X } from "lucide-react";
+import {
+  BookMarked,
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  Loader2,
+  X,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { fetchBookPages, type BookPage } from "@/lib/books-reader";
 import {
   AGE_CATEGORY_LABELS,
   fetchBooks,
@@ -31,76 +40,153 @@ function BookReaderModal({
   book: Book;
   onClose: () => void;
 }) {
-  // Блокируем прокрутку страницы, пока открыт ридер.
+  const [pages, setPages] = useState<BookPage[]>([]);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-
     return () => {
       document.body.style.overflow = previous;
     };
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchBookPages(book.id)
+      .then((loaded) => {
+        if (!cancelled) setPages(loaded);
+      })
+      .catch(() => {
+        if (!cancelled) setPages([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [book.id]);
+
+  const page = pages[pageIndex];
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.25 }}
       className="fixed inset-0 z-[60] flex flex-col bg-[#faf6ee]"
     >
       <div className="flex items-center gap-3 border-b border-stone-200/80 bg-white/80 px-5 py-4 backdrop-blur-lg">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-amber-200 bg-amber-100/80 text-amber-700">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-3xl border border-amber-200 bg-amber-100/80 text-amber-700">
           <BookOpen className="h-5 w-5" />
         </div>
         <div className="min-w-0 flex-1">
           <h2 className="truncate text-sm font-semibold text-stone-800">
             {book.title}
           </h2>
-          <p className="truncate text-xs text-stone-400">{book.author}</p>
+          <p className="truncate text-xs text-stone-400">
+            {book.author}
+            {pages.length > 0 && ` · стр. ${pageIndex + 1}/${pages.length}`}
+          </p>
         </div>
         <motion.button
           type="button"
           onClick={onClose}
           whileTap={{ scale: 0.9 }}
           aria-label="Закрыть книгу"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-500 transition-colors hover:bg-stone-100"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-500"
         >
           <X className="h-4.5 w-4.5" />
         </motion.button>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, delay: 0.1 }}
-        className="flex-1 overflow-y-auto px-6 py-6 pb-[max(env(safe-area-inset-bottom),1.5rem)]"
-      >
-        <div className="mx-auto max-w-md">
-          {book.content_text ? (
-            <p className="whitespace-pre-line text-[15px] leading-[1.85] text-stone-700">
-              {book.content_text}
-            </p>
-          ) : (
-            <div className="py-16 text-center">
-              <p className="text-sm text-stone-500">
-                Текст этой книги ещё не добавлен.
+      <div className="flex flex-1 flex-col px-5 py-6 pb-[max(env(safe-area-inset-bottom),1.5rem)]">
+        {loading && (
+          <div className="flex flex-1 items-center justify-center gap-2 text-stone-400">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            Загружаем страницы...
+          </div>
+        )}
+
+        {!loading && pages.length === 0 && (
+          <div className="flex flex-1 flex-col items-center justify-center text-center">
+            <p className="text-sm text-stone-500">Страницы ещё не добавлены.</p>
+            {book.content_text && (
+              <p className="mt-4 max-w-md whitespace-pre-line text-sm leading-relaxed text-stone-700">
+                {book.content_text}
               </p>
-              {book.content_url && (
-                <a
-                  href={book.content_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-emerald-700 hover:text-emerald-600"
-                >
-                  Открыть внешний источник
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </a>
+            )}
+            {book.content_url && (
+              <a
+                href={book.content_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-emerald-700"
+              >
+                Внешний источник
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+            )}
+          </div>
+        )}
+
+        {!loading && page && (
+          <AnimatePresence mode="wait">
+            <motion.article
+              key={page.id}
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -40 }}
+              transition={{ type: "spring", stiffness: 280, damping: 28 }}
+              className="mx-auto flex min-h-[50vh] w-full max-w-md flex-1 flex-col rounded-3xl border border-stone-200/80 bg-white/90 p-6 shadow-sm"
+            >
+              {page.illustration_url && (
+                // eslint-disable-next-line @next/next/no-img-element -- external illustration URLs
+                <img
+                  src={page.illustration_url}
+                  alt=""
+                  className="mb-4 max-h-40 w-full rounded-3xl object-cover"
+                />
               )}
-            </div>
-          )}
-        </div>
-      </motion.div>
+              <div
+                className="flex-1 text-[15px] leading-[1.9] text-stone-700"
+                dangerouslySetInnerHTML={{ __html: page.content_html }}
+              />
+            </motion.article>
+          </AnimatePresence>
+        )}
+
+        {pages.length > 1 && (
+          <div className="mt-4 flex items-center justify-between gap-3">
+            <motion.button
+              type="button"
+              disabled={pageIndex <= 0}
+              onClick={() => setPageIndex((v) => Math.max(0, v - 1))}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-1 rounded-3xl border border-stone-200 bg-white px-4 py-2 text-sm disabled:opacity-40"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Назад
+            </motion.button>
+            <motion.button
+              type="button"
+              disabled={pageIndex >= pages.length - 1}
+              onClick={() =>
+                setPageIndex((v) => Math.min(pages.length - 1, v + 1))
+              }
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-1 rounded-3xl border border-emerald-300 bg-emerald-500 px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
+            >
+              Далее
+              <ChevronRight className="h-4 w-4" />
+            </motion.button>
+          </div>
+        )}
+      </div>
     </motion.div>
   );
 }

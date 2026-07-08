@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useTransform } from "framer-motion";
 import { CheckCircle2, Languages, Volume2, XCircle } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -12,6 +12,72 @@ import {
 } from "@/lib/arabic-alphabet";
 
 type GameState = "idle" | "answered";
+
+function Flashcards() {
+  const [index, setIndex] = useState(0);
+  const [flipped, setFlipped] = useState(false);
+  const x = useMotionValue(0);
+  const rotate = useTransform(x, [-120, 120], [-8, 8]);
+
+  const letter = ARABIC_ALPHABET[index % ARABIC_ALPHABET.length];
+
+  function nextCard(direction: 1 | -1) {
+    setFlipped(false);
+    setIndex((v) => {
+      const next = v + direction;
+      if (next < 0) return ARABIC_ALPHABET.length - 1;
+      if (next >= ARABIC_ALPHABET.length) return 0;
+      return next;
+    });
+    x.set(0);
+  }
+
+  return (
+    <div className="mb-5">
+      <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-stone-500">
+        Flashcards · свайп влево/вправо
+      </p>
+      <motion.div
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        style={{ x, rotate }}
+        onDragEnd={(_, info) => {
+          if (info.offset.x > 80) nextCard(-1);
+          else if (info.offset.x < -80) nextCard(1);
+        }}
+        onClick={() => setFlipped((v) => !v)}
+        whileTap={{ scale: 0.98 }}
+        className="mx-auto flex h-40 w-full max-w-xs cursor-pointer flex-col items-center justify-center rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-amber-50 shadow-sm"
+      >
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={`${index}-${flipped}`}
+            initial={{ opacity: 0, rotateY: 90 }}
+            animate={{ opacity: 1, rotateY: 0 }}
+            exit={{ opacity: 0, rotateY: -90 }}
+            className="text-center"
+          >
+            {flipped ? (
+              <>
+                <p className="text-lg font-semibold text-stone-800">
+                  {letter.name}
+                </p>
+                <p className="text-sm text-stone-500">{letter.transliteration}</p>
+              </>
+            ) : (
+              <p dir="rtl" lang="ar" className="text-5xl text-stone-800">
+                {letter.char}
+              </p>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </motion.div>
+      <p className="mt-2 text-center text-[10px] text-stone-400">
+        Нажмите, чтобы перевернуть · {index + 1}/{ARABIC_ALPHABET.length}
+      </p>
+    </div>
+  );
+}
 
 export function ArabicSection() {
   const [activeLetter, setActiveLetter] = useState<number | null>(null);
@@ -80,6 +146,8 @@ export function ArabicSection() {
 
   return (
     <div className="space-y-5">
+      <Flashcards />
+
       <div>
         <p className="mb-3 text-xs font-medium uppercase tracking-wider text-stone-400">
           Алфавит · нажми для озвучки
