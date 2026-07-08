@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -31,6 +32,10 @@ interface TelegramContextValue {
   isTelegram: boolean;
   isDevMode: boolean;
   syncError: string | null;
+  /** Перечитывает профиль из БД (баланс, XP) без перезагрузки страницы. */
+  refreshUser: () => Promise<void>;
+  /** Локально обновляет поля профиля (например, награду в DEV-режиме). */
+  patchUser: (patch: Partial<DbUser>) => void;
 }
 
 const TelegramContext = createContext<TelegramContextValue | null>(null);
@@ -141,6 +146,23 @@ export function TelegramContextProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  const refreshUser = useCallback(async () => {
+    if (!telegramUser) {
+      return;
+    }
+
+    try {
+      const freshUser = await syncUserViaApi(telegramUser);
+      setDbUser(freshUser);
+    } catch (error) {
+      console.error("[Telegram] Failed to refresh user:", error);
+    }
+  }, [telegramUser]);
+
+  const patchUser = useCallback((patch: Partial<DbUser>) => {
+    setDbUser((current) => (current ? { ...current, ...patch } : current));
+  }, []);
+
   const value = useMemo(
     () => ({
       webApp,
@@ -150,8 +172,20 @@ export function TelegramContextProvider({ children }: { children: ReactNode }) {
       isTelegram,
       isDevMode,
       syncError,
+      refreshUser,
+      patchUser,
     }),
-    [webApp, telegramUser, dbUser, isReady, isTelegram, isDevMode, syncError],
+    [
+      webApp,
+      telegramUser,
+      dbUser,
+      isReady,
+      isTelegram,
+      isDevMode,
+      syncError,
+      refreshUser,
+      patchUser,
+    ],
   );
 
   return (

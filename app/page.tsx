@@ -5,6 +5,7 @@ import { Coins, Sparkles, UserRound } from "lucide-react";
 
 import { CoinTransferForm } from "@/components/coin-transfer-form";
 import { PrayerTimesWidget } from "@/components/prayer-times-widget";
+import { QuizWizard } from "@/components/quiz-wizard";
 import { useTelegram } from "@/components/telegram-provider";
 import type { DbUser } from "@/lib/users";
 
@@ -147,6 +148,10 @@ function HomeContent({ dbUser, isDevMode }: HomeContentProps) {
 
       <motion.div variants={cardVariants} className="flex w-full justify-center">
         <PrayerTimesWidget />
+      </motion.div>
+
+      <motion.div variants={cardVariants} className="flex w-full justify-center">
+        <QuizWizard />
       </motion.div>
 
       <motion.div variants={cardVariants} className="flex w-full justify-center">
