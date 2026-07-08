@@ -1,4 +1,5 @@
-import { supabase } from "@/lib/supabase";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
 import type { TelegramUser } from "@/lib/telegram";
 
 export interface DbUser {
@@ -22,6 +23,7 @@ export const DEV_MOCK_USER: DbUser = {
 };
 
 export async function syncTelegramUser(
+  supabase: SupabaseClient,
   telegramUser: TelegramUser,
 ): Promise<DbUser> {
   const { data: existing, error: fetchError } = await supabase
@@ -64,4 +66,27 @@ export async function syncTelegramUser(
   }
 
   return updated as DbUser;
+}
+
+export async function syncUserViaApi(
+  telegramUser: TelegramUser,
+): Promise<DbUser> {
+  const response = await fetch("/api/user/sync", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(telegramUser),
+  });
+
+  const payload = (await response.json()) as {
+    user?: DbUser;
+    error?: string;
+  };
+
+  if (!response.ok || !payload.user) {
+    throw new Error(payload.error ?? "Failed to sync user with Supabase");
+  }
+
+  return payload.user;
 }

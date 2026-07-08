@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 
 export const DAILY_TRANSFER_LIMIT = 50;
 export const DAILY_LIMIT_MESSAGE =
@@ -41,7 +41,7 @@ async function getTransferredLast24h(
 ): Promise<number> {
   const since = new Date(Date.now() - DAY_IN_MS).toISOString();
 
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("points_transfers")
     .select("amount")
     .eq("sender_id", senderId)
@@ -61,7 +61,7 @@ async function getTransferredLast24h(
 }
 
 async function fetchUserCoins(userId: number): Promise<number> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("users")
     .select("id, coins")
     .eq("id", userId)
@@ -79,7 +79,7 @@ async function fetchUserCoins(userId: number): Promise<number> {
 }
 
 async function updateUserCoins(userId: number, coins: number): Promise<void> {
-  const { error } = await supabase
+  const { error } = await getSupabase()
     .from("users")
     .update({ coins })
     .eq("id", userId);
@@ -126,7 +126,7 @@ export async function transferCoins(
     throw error;
   }
 
-  const { error: recordError } = await supabase
+  const { error: recordError } = await getSupabase()
     .from("points_transfers")
     .insert({
       sender_id: senderId,
