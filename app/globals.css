@@ -16,18 +16,37 @@ body {
   background:
     radial-gradient(
       56rem 40rem at 88% -10%,
-      rgba(16, 185, 129, 0.1),
+      rgba(16, 185, 129, 0.14),
       transparent 60%
     ),
     radial-gradient(
       44rem 34rem at -14% 16%,
-      rgba(217, 164, 65, 0.12),
+      rgba(217, 164, 65, 0.16),
       transparent 55%
+    ),
+    radial-gradient(
+      30rem 24rem at 50% 100%,
+      rgba(167, 139, 250, 0.08),
+      transparent 50%
     ),
     linear-gradient(180deg, #fbf7ef 0%, #f8f2e7 55%, #f4ecdd 100%);
   background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+}
+
+@keyframes cozy-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.015);
+  }
+}
+
+.animate-cozy-breathe {
+  animation: cozy-breathe 3.2s ease-in-out infinite;
 }
 
 ::selection {

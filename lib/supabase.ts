@@ -4,10 +4,11 @@ const SUPABASE_URL_KEY = "NEXT_PUBLIC_SUPABASE_URL";
 const SUPABASE_ANON_KEY = "NEXT_PUBLIC_SUPABASE_ANON_KEY";
 
 let browserClient: SupabaseClient | null = null;
+let configWarningLogged = false;
 
 function readEnv(name: string): string | undefined {
   const value = process.env[name];
-  return value && value.trim().length > 0 ? value : undefined;
+  return value && value.trim().length > 0 ? value.trim() : undefined;
 }
 
 export function getSupabaseConfigError(): string | null {
@@ -28,12 +29,16 @@ export function getSupabaseConfigError(): string | null {
   return `[Supabase] Missing environment variable(s): ${missing.join(", ")}`;
 }
 
-export function getSupabase(): SupabaseClient {
+/** Returns null instead of throwing — safe for optional Realtime features. */
+export function getSupabaseOrNull(): SupabaseClient | null {
   const configError = getSupabaseConfigError();
 
   if (configError) {
-    console.error(configError);
-    throw new Error(configError);
+    if (!configWarningLogged) {
+      console.warn(configError);
+      configWarningLogged = true;
+    }
+    return null;
   }
 
   if (!browserClient) {
@@ -44,4 +49,19 @@ export function getSupabase(): SupabaseClient {
   }
 
   return browserClient;
+}
+
+/** @deprecated Prefer getSupabaseOrNull() for client-side optional features. */
+export function getSupabase(): SupabaseClient {
+  const client = getSupabaseOrNull();
+
+  if (!client) {
+    throw new Error(getSupabaseConfigError() ?? "Supabase is not configured");
+  }
+
+  return client;
+}
+
+export function isSupabaseConfigured(): boolean {
+  return getSupabaseConfigError() === null;
 }

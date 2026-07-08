@@ -1,26 +1,37 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, Heart, MapPin } from "lucide-react";
+import {
+  ArrowLeft,
+  Heart,
+  MapPin,
+  RotateCcw,
+  Skull,
+  Sparkles,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { useTelegram } from "@/components/telegram-provider";
+import {
+  fetchAcademyQuestions,
+  fetchDevAcademyQuestions,
+  shuffleQuestions,
+  submitDevAcademyAnswer,
+  type AcademyDifficulty,
+} from "@/lib/academy-quiz";
+import { cozyCardClass, springPop } from "@/lib/animations";
 import { fireCelebrationConfetti } from "@/lib/confetti";
-import { cozyCardClass } from "@/lib/animations";
+import { hapticError, hapticSuccess } from "@/lib/haptic";
 import {
-  fetchDevLevelTestQuestions,
-  fetchLevelTestQuestions,
-} from "@/lib/level-test";
-import {
-  submitDevQuizAnswer,
   submitQuizAnswer,
   type QuizQuestion,
 } from "@/lib/quiz";
 
 const MAP_NODES = 8;
+const MAX_LIVES = 3;
 
 interface ScholarPathGameProps {
-  difficulty: "easy" | "medium" | "hardcore";
+  difficulty: AcademyDifficulty;
   onBack: () => void;
 }
 
@@ -29,21 +40,23 @@ export function ScholarPathGame({ difficulty, onBack }: ScholarPathGameProps) {
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [level, setLevel] = useState(0);
-  const [lives, setLives] = useState(3);
+  const [lives, setLives] = useState(MAX_LIVES);
+  const [lostHeart, setLostHeart] = useState<number | null>(null);
   const [qIndex, setQIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [finished, setFinished] = useState(false);
+  const [won, setWon] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
 
     void (async () => {
       const loaded = isDevMode
-        ? await fetchDevLevelTestQuestions()
-        : await fetchLevelTestQuestions();
+        ? await fetchDevAcademyQuestions(difficulty, 20)
+        : await fetchAcademyQuestions(difficulty, 20);
 
       if (!cancelled) {
-        setQuestions(loaded.slice(0, MAP_NODES));
+        setQuestions(shuffleQuestions(loaded).slice(0, MAP_NODES));
         setLoading(false);
       }
     })();
@@ -51,7 +64,18 @@ export function ScholarPathGame({ difficulty, onBack }: ScholarPathGameProps) {
     return () => {
       cancelled = true;
     };
-  }, [isDevMode]);
+  }, [isDevMode, difficulty]);
+
+  function restart() {
+    setLevel(0);
+    setLives(MAX_LIVES);
+    setQIndex(0);
+    setSelected(null);
+    setFinished(false);
+    setWon(false);
+    setLostHeart(null);
+    setQuestions((prev) => shuffleQuestions(prev));
+  }
 
   const question = questions[qIndex] ?? null;
 
@@ -61,16 +85,18 @@ export function ScholarPathGame({ difficulty, onBack }: ScholarPathGameProps) {
     setSelected(optionIndex);
 
     const result = isDevMode
-      ? await submitDevQuizAnswer(question.id, optionIndex)
+      ? await submitDevAcademyAnswer(question.id, optionIndex)
       : await submitQuizAnswer(dbUser.id, question.id, optionIndex);
 
     window.setTimeout(async () => {
       if (result.correct) {
+        hapticSuccess();
         const nextLevel = level + 1;
         setLevel(nextLevel);
 
         if (qIndex + 1 >= questions.length) {
           setFinished(true);
+          setWon(true);
           fireCelebrationConfetti();
 
           if (difficulty === "hardcore") {
@@ -98,22 +124,35 @@ export function ScholarPathGame({ difficulty, onBack }: ScholarPathGameProps) {
 
         setQIndex((v) => v + 1);
       } else {
+        hapticError();
         const nextLives = lives - 1;
+        setLostHeart(nextLives);
         setLives(nextLives);
+
         if (nextLives <= 0) {
           setFinished(true);
+          setWon(false);
+          setSelected(null);
           return;
         }
       }
 
       setSelected(null);
-    }, 600);
+      window.setTimeout(() => setLostHeart(null), 500);
+    }, 650);
   }
 
   if (loading) {
     return (
-      <div className={`${cozyCardClass} px-5 py-10 text-center text-sm text-stone-400`}>
-        Строим карту пути учёного...
+      <div
+        className={`${cozyCardClass} px-5 py-10 text-center text-sm text-stone-400`}
+      >
+        <motion.div
+          animate={{ scale: [1, 1.05, 1] }}
+          transition={{ repeat: Infinity, duration: 1.6 }}
+        >
+          Строим карту пути учёного...
+        </motion.div>
       </div>
     );
   }
@@ -129,77 +168,137 @@ export function ScholarPathGame({ difficulty, onBack }: ScholarPathGameProps) {
         Назад в Академию
       </button>
 
+      <div className="mb-2 flex items-center gap-2">
+        <Skull className="h-4 w-4 text-amber-600" />
+        <span className="text-sm font-semibold text-stone-800">Путь учёного</span>
+      </div>
+
       <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-1">
-          {Array.from({ length: 3 }, (_, i) => (
-            <Heart
+        <div className="flex items-center gap-1.5">
+          {Array.from({ length: MAX_LIVES }, (_, i) => (
+            <motion.div
               key={i}
-              className={`h-4 w-4 ${
-                i < lives ? "fill-red-400 text-red-400" : "text-stone-300"
-              }`}
-            />
+              animate={
+                lostHeart === i
+                  ? { scale: [1, 1.4, 0], opacity: [1, 1, 0], rotate: [0, 15, -15] }
+                  : { scale: 1, opacity: i < lives ? 1 : 0.25 }
+              }
+              transition={{ duration: 0.45 }}
+            >
+              <Heart
+                className={`h-5 w-5 ${
+                  i < lives ? "fill-rose-400 text-rose-400" : "text-stone-300"
+                }`}
+              />
+            </motion.div>
           ))}
         </div>
-        <span className="text-xs text-stone-500">
-          Уровень {Math.min(level + 1, MAP_NODES)} / {MAP_NODES}
+        <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
+          Уровень {Math.min(level + 1, MAP_NODES)}/{MAP_NODES}
         </span>
       </div>
 
-      <div className="mb-4 flex justify-between px-1">
+      <div className="relative mb-5 h-2 overflow-hidden rounded-full bg-stone-200/70">
+        <motion.div
+          className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-amber-300 to-violet-400"
+          animate={{ width: `${(level / MAP_NODES) * 100}%` }}
+          transition={{ type: "spring", stiffness: 200, damping: 22 }}
+        />
+      </div>
+
+      <div className="mb-5 flex justify-between px-0.5">
         {Array.from({ length: MAP_NODES }, (_, i) => (
-          <MapPin
+          <motion.div
             key={i}
-            className={`h-4 w-4 ${
-              i <= level ? "text-emerald-600" : "text-stone-300"
-            }`}
-          />
+            animate={i === level && !finished ? { scale: [1, 1.2, 1] } : {}}
+            transition={{ repeat: Infinity, duration: 2 }}
+          >
+            <MapPin
+              className={`h-5 w-5 ${
+                i < level
+                  ? "fill-emerald-500 text-emerald-600"
+                  : i === level && !finished
+                    ? "text-amber-500"
+                    : "text-stone-300"
+              }`}
+            />
+          </motion.div>
         ))}
       </div>
 
       <AnimatePresence mode="wait">
         {finished ? (
-          <motion.p
+          <motion.div
             key="done"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="py-6 text-center text-sm font-medium text-stone-700"
+            {...springPop}
+            className="py-4 text-center"
           >
-            {lives > 0
-              ? "Путь пройден! Награда начислена."
-              : "Жизни закончились. Попробуйте снова!"}
-          </motion.p>
+            <p className="text-sm font-semibold text-stone-800">
+              {won
+                ? "Путь пройден! Машаллах!"
+                : "Жизни закончились..."}
+            </p>
+            <p className="mt-1 text-xs text-stone-500">
+              {won && difficulty === "hardcore"
+                ? "Хардкор пройден — проверьте алмазы 💎"
+                : won
+                  ? "Продолжайте учиться каждый день"
+                  : "Попробуйте снова — знания приходят с практикой"}
+            </p>
+            <motion.button
+              type="button"
+              onClick={restart}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.96 }}
+              className="mt-4 inline-flex items-center gap-2 rounded-3xl border border-emerald-300 bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Заново
+            </motion.button>
+          </motion.div>
         ) : question ? (
           <motion.div
             key={question.id}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -40 }}
+            transition={{ type: "spring", stiffness: 280, damping: 26 }}
           >
-            <p className="mb-3 text-sm font-medium text-stone-800">
+            <p className="mb-3 text-sm font-medium leading-snug text-stone-800">
               {question.question_text}
             </p>
             <ul className="space-y-2">
-              {question.options.map((opt, index) => (
-                <li key={index}>
-                  <motion.button
-                    type="button"
-                    disabled={selected !== null}
-                    onClick={() => void answer(index)}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className={`w-full rounded-3xl border px-4 py-3 text-left text-sm ${
-                      selected === index
-                        ? "border-emerald-300 bg-emerald-50"
-                        : "border-stone-200 bg-white/80"
-                    }`}
-                  >
-                    {opt}
-                  </motion.button>
-                </li>
-              ))}
+              {question.options.map((opt, index) => {
+                let cls =
+                  "border-stone-200/80 bg-white/90 text-stone-700 hover:border-emerald-200";
+
+                if (selected === index) {
+                  cls = "border-emerald-300 bg-emerald-50 text-emerald-800";
+                }
+
+                return (
+                  <li key={index}>
+                    <motion.button
+                      type="button"
+                      disabled={selected !== null}
+                      onClick={() => void answer(index)}
+                      whileHover={selected === null ? { scale: 1.02 } : undefined}
+                      whileTap={selected === null ? { scale: 0.97 } : undefined}
+                      className={`w-full rounded-3xl border px-4 py-3 text-left text-sm ${cls}`}
+                    >
+                      {opt}
+                    </motion.button>
+                  </li>
+                );
+              })}
             </ul>
           </motion.div>
-        ) : null}
+        ) : (
+          <p className="py-6 text-center text-xs text-stone-400">
+            <Sparkles className="mx-auto mb-2 h-5 w-5" />
+            Вопросы для этого уровня скоро появятся
+          </p>
+        )}
       </AnimatePresence>
     </div>
   );

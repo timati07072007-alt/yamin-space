@@ -1,4 +1,4 @@
-import { getSupabase } from "@/lib/supabase";
+import { getSupabaseOrNull } from "@/lib/supabase";
 
 export interface ChatMessage {
   id: number;
@@ -39,7 +39,18 @@ export async function sendChatMessage(
 export function subscribeToChat(
   onInsert: (message: ChatMessage) => void,
 ): () => void {
-  const supabase = getSupabase();
+  const supabase = getSupabaseOrNull();
+
+  if (!supabase) {
+    const interval = window.setInterval(() => {
+      void fetchChatMessages(60).then((list) => {
+        const latest = list[list.length - 1];
+        if (latest) onInsert(latest);
+      });
+    }, 8000);
+
+    return () => window.clearInterval(interval);
+  }
 
   const channel = supabase
     .channel("global_chat_live")

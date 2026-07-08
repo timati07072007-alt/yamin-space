@@ -15,14 +15,17 @@ import { useEffect, useState } from "react";
 import { useTelegram } from "@/components/telegram-provider";
 import { fireCelebrationConfetti } from "@/lib/confetti";
 import {
-  fetchDevLevelTestQuestions,
-  fetchLevelTestQuestions,
-  submitDevLevelTest,
-  submitLevelTest,
-  type KnowledgeTitle,
-  type LevelTestAnswer,
-} from "@/lib/level-test";
-import type { QuizQuestion } from "@/lib/quiz";
+  fetchAcademyQuestions,
+  fetchDevAcademyQuestions,
+  shuffleQuestions,
+  submitDevAcademyAnswer,
+  type AcademyDifficulty,
+} from "@/lib/academy-quiz";
+import { resolveKnowledgeTitle, type KnowledgeTitle } from "@/lib/level-test";
+import {
+  submitQuizAnswer,
+  type QuizQuestion,
+} from "@/lib/quiz";
 
 const cozyCard =
   "w-full max-w-sm overflow-hidden rounded-[2rem] border border-amber-900/10 bg-white/75 shadow-[0_20px_50px_-24px_rgba(146,104,41,0.35)] backdrop-blur-xl";
@@ -37,15 +40,21 @@ type Phase = "idle" | "loading" | "playing" | "submitting" | "results";
 
 interface LevelTestCardProps {
   compact?: boolean;
+  difficulty?: AcademyDifficulty;
 }
 
-export function LevelTestCard({ compact = false }: LevelTestCardProps) {
+export function LevelTestCard({
+  compact = false,
+  difficulty = "easy",
+}: LevelTestCardProps) {
   const { dbUser, isDevMode, refreshUser, patchUser } = useTelegram();
 
   const [phase, setPhase] = useState<Phase>("idle");
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [questionIndex, setQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<LevelTestAnswer[]>([]);
+  const [answers, setAnswers] = useState<
+    Array<{ questionId: number; correct: boolean }>
+  >([]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [resultTitle, setResultTitle] = useState<KnowledgeTitle | null>(null);
@@ -78,16 +87,18 @@ export function LevelTestCard({ compact = false }: LevelTestCardProps) {
 
     try {
       const loaded = isDevMode
-        ? await fetchDevLevelTestQuestions()
-        : await fetchLevelTestQuestions();
+        ? await fetchDevAcademyQuestions(difficulty, 20)
+        : await fetchAcademyQuestions(difficulty, 20);
 
-      if (loaded.length === 0) {
+      const picked = shuffleQuestions(loaded).slice(0, 10);
+
+      if (picked.length === 0) {
         setError("Вопросы теста пока недоступны");
         setPhase("idle");
         return;
       }
 
-      setQuestions(loaded);
+      setQuestions(picked);
       setPhase("playing");
     } catch (cause) {
       setError(
@@ -97,16 +108,20 @@ export function LevelTestCard({ compact = false }: LevelTestCardProps) {
     }
   }
 
-  function selectAnswer(optionIndex: number) {
-    if (!question || phase !== "playing") {
+  async function selectAnswer(optionIndex: number) {
+    if (!question || phase !== "playing" || !dbUser) {
       return;
     }
 
     setSelectedIndex(optionIndex);
 
+    const result = isDevMode
+      ? await submitDevAcademyAnswer(question.id, optionIndex)
+      : await submitQuizAnswer(dbUser.id, question.id, optionIndex);
+
     const nextAnswers = [
       ...answers.filter((item) => item.questionId !== question.id),
-      { questionId: question.id, selectedOptionIndex: optionIndex },
+      { questionId: question.id, correct: result.correct },
     ];
 
     setAnswers(nextAnswers);
@@ -122,7 +137,9 @@ export function LevelTestCard({ compact = false }: LevelTestCardProps) {
     }, 280);
   }
 
-  async function finishTest(finalAnswers: LevelTestAnswer[]) {
+  async function finishTest(
+    finalAnswers: Array<{ questionId: number; correct: boolean }>,
+  ) {
     if (!dbUser) {
       return;
     }
@@ -130,23 +147,39 @@ export function LevelTestCard({ compact = false }: LevelTestCardProps) {
     setPhase("submitting");
 
     try {
-      const result = isDevMode
-        ? await submitDevLevelTest(finalAnswers)
-        : await submitLevelTest(dbUser.id, finalAnswers);
+      const score = finalAnswers.filter((a) => a.correct).length;
+      const total = questions.length;
+      const title = resolveKnowledgeTitle(score, total);
+      const xpAwarded = score * (difficulty === "hardcore" ? 12 : difficulty === "medium" ? 10 : 8);
+      const coinsAwarded = score * (difficulty === "hardcore" ? 6 : difficulty === "medium" ? 5 : 4);
 
-      setScore(result.score);
-      setResultTitle(result.title);
-      setXpAwarded(result.xpAwarded);
-      setCoinsAwarded(result.coinsAwarded);
+      setScore(score);
+      setResultTitle(title);
+      setXpAwarded(xpAwarded);
+      setCoinsAwarded(coinsAwarded);
       setPhase("results");
 
       if (isDevMode) {
         patchUser({
-          title: result.title,
-          xp: dbUser.xp + result.xpAwarded,
-          coins: dbUser.coins + result.coinsAwarded,
+          title,
+          xp: dbUser.xp + xpAwarded,
+          coins: dbUser.coins + coinsAwarded,
+          ...(difficulty === "hardcore" && score >= total * 0.8
+            ? { diamonds: dbUser.diamonds + 1 }
+            : {}),
         });
       } else {
+        if (difficulty === "hardcore" && score >= total * 0.8) {
+          await fetch("/api/gamification/reward", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              userId: dbUser.id,
+              xpAwarded,
+              diamondAward: 1,
+            }),
+          });
+        }
         await refreshUser();
       }
 
