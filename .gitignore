@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# seed temp artifacts
+supabase/.seed-*
+supabase/.tmp-*
+supabase/_seed-combined.txt
+supabase/seed-mcp-parts/
+scripts/to_import.csv
+scripts/debug-csv.mjs
+.cursor/

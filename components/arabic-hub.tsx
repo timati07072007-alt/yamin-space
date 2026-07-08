@@ -1,16 +1,17 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { BookOpen, Grid3X3, Languages } from "lucide-react";
+import { BookOpen, Brain, Grid3X3, Languages } from "lucide-react";
 import { useState } from "react";
 
 import { ArabicAlphabetPanel } from "@/components/arabic-alphabet-panel";
 import { ArabicDictionaryPanel } from "@/components/arabic-dictionary-panel";
 import { ArabicGrammarPanel } from "@/components/arabic-grammar-panel";
+import { ArabicLearnPanel } from "@/components/arabic-learn-panel";
 import { cozyCardClass, staggerContainer, staggerItem } from "@/lib/animations";
 import { hapticSelection } from "@/lib/haptic";
 
-type ArabicSection = "alphabet" | "words" | "grammar";
+type ArabicSection = "alphabet" | "words" | "learn" | "grammar";
 
 const SECTIONS: Array<{
   id: ArabicSection;
@@ -32,6 +33,13 @@ const SECTIONS: Array<{
     desc: "Словарь с озвучкой",
     icon: Languages,
     color: "from-sky-100 to-blue-50",
+  },
+  {
+    id: "learn",
+    label: "Учить",
+    desc: "Карточки и викторина",
+    icon: Brain,
+    color: "from-amber-100 to-orange-50",
   },
   {
     id: "grammar",
@@ -60,7 +68,7 @@ export function ArabicHub() {
           Арабский язык
         </p>
         <p className="mt-1 text-xs text-[var(--theme-text-muted)]">
-          Алфавит → Слова → Правила и грамматика
+          Алфавит → Слова → Учить → Правила
         </p>
       </motion.header>
 
@@ -111,6 +119,7 @@ export function ArabicHub() {
         >
           {section === "alphabet" && <ArabicAlphabetPanel />}
           {section === "words" && <ArabicDictionaryPanel />}
+          {section === "learn" && <ArabicLearnPanel />}
           {section === "grammar" && <ArabicGrammarPanel />}
         </motion.div>
       </AnimatePresence>

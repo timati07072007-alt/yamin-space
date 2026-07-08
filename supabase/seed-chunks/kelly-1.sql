@@ -1,0 +1,1 @@
+-- Kelly frequency list: 1000 words

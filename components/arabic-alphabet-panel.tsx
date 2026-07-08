@@ -2,19 +2,32 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Volume2, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { cozyCardClass } from "@/lib/animations";
 import {
   ARABIC_ALPHABET_FULL,
-  speakArabicLetter,
   type ArabicLetterFull,
 } from "@/lib/arabic-alphabet";
+import { speakArabicLetter, primeArabicVoices } from "@/lib/arabic-audio";
 import { hapticSelection } from "@/lib/haptic";
 
 export function ArabicAlphabetPanel() {
   const [selected, setSelected] = useState<ArabicLetterFull | null>(null);
   const [flipped, setFlipped] = useState(false);
+
+  useEffect(() => {
+    primeArabicVoices();
+  }, []);
+
+  useEffect(() => {
+    if (!selected) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [selected]);
 
   function openLetter(letter: ArabicLetterFull) {
     hapticSelection();
@@ -51,7 +64,7 @@ export function ArabicAlphabetPanel() {
               damping: 22,
               delay: i * 0.02,
             }}
-            whileHover={{ scale: 1.08, y: -3 }}
+            whileHover={{ scale: 1.06, y: -2 }}
             whileTap={{ scale: 0.92 }}
             className="flex aspect-square flex-col items-center justify-center rounded-2xl border border-[var(--theme-border)] bg-gradient-to-br from-emerald-50/80 to-amber-50/60 shadow-sm dark:from-emerald-950/30 dark:to-amber-950/20"
           >
@@ -71,36 +84,40 @@ export function ArabicAlphabetPanel() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+            className="letter-modal-overlay fixed inset-0 z-50 flex items-end justify-center sm:items-center"
             onClick={close}
           >
             <motion.div
-              initial={{ scale: 0.85, y: 24 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 16 }}
-              transition={{ type: "spring", stiffness: 380, damping: 26 }}
-              className="w-full max-w-sm rounded-[2rem] border border-[var(--theme-border)] bg-[var(--theme-surface)] p-5 shadow-2xl"
+              initial={{ y: 32, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 24, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 380, damping: 30 }}
+              className="letter-modal-sheet w-full max-w-sm"
               onClick={(e) => e.stopPropagation()}
-              style={{ perspective: 1000 }}
+              style={{ perspective: 900 }}
             >
-              <div className="mb-3 flex items-center justify-between">
-                <p className="font-semibold text-[var(--theme-text)]">
+              <div className="mb-3 flex shrink-0 items-center justify-between gap-2">
+                <p className="truncate font-semibold text-[var(--theme-text)]">
                   {selected.name}
                 </p>
-                <button type="button" onClick={close}>
+                <button
+                  type="button"
+                  onClick={close}
+                  aria-label="Закрыть"
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--theme-border)]"
+                >
                   <X className="h-4 w-4 text-[var(--theme-text-muted)]" />
                 </button>
               </div>
 
-              <motion.button
+              <button
                 type="button"
                 onClick={() => {
                   hapticSelection();
                   setFlipped((v) => !v);
                   if (!flipped) speakArabicLetter(selected.speech);
                 }}
-                whileTap={{ scale: 0.96 }}
-                className="mx-auto flex h-40 w-full items-center justify-center rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-amber-50 dark:from-emerald-950/40"
+                className="letter-flip-card mx-auto flex w-full max-w-full items-center justify-center rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-amber-50 dark:from-emerald-950/40"
                 style={{ transformStyle: "preserve-3d" }}
               >
                 <AnimatePresence mode="wait">
@@ -109,15 +126,15 @@ export function ArabicAlphabetPanel() {
                     initial={{ rotateY: -90, opacity: 0 }}
                     animate={{ rotateY: 0, opacity: 1 }}
                     exit={{ rotateY: 90, opacity: 0 }}
-                    transition={{ duration: 0.4, type: "spring", stiffness: 260 }}
-                    className="text-center"
+                    transition={{ duration: 0.35, type: "spring", stiffness: 260 }}
+                    className="w-full px-3 text-center"
                   >
                     {flipped ? (
                       <>
-                        <p className="text-lg font-semibold text-[var(--theme-text)]">
+                        <p className="text-base font-semibold text-[var(--theme-text)] sm:text-lg">
                           {selected.name}
                         </p>
-                        <p className="text-sm text-[var(--theme-text-muted)]">
+                        <p className="mt-1 text-xs text-[var(--theme-text-muted)] sm:text-sm">
                           Звук: {selected.transliteration}
                         </p>
                       </>
@@ -125,14 +142,14 @@ export function ArabicAlphabetPanel() {
                       <span
                         dir="rtl"
                         lang="ar"
-                        className="text-7xl text-[var(--theme-text)]"
+                        className="letter-modal-glyph block text-[var(--theme-text)]"
                       >
                         {selected.char}
                       </span>
                     )}
                   </motion.div>
                 </AnimatePresence>
-              </motion.button>
+              </button>
 
               <motion.button
                 type="button"
@@ -155,12 +172,16 @@ export function ArabicAlphabetPanel() {
                 ).map(([label, form]) => (
                   <div
                     key={label}
-                    className="rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-3 py-2 text-center"
+                    className="letter-form-cell rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-bg)] px-2 py-2 text-center"
                   >
                     <p className="text-[9px] text-[var(--theme-text-muted)]">
                       {label}
                     </p>
-                    <p dir="rtl" lang="ar" className="text-2xl text-[var(--theme-text)]">
+                    <p
+                      dir="rtl"
+                      lang="ar"
+                      className="letter-form-glyph text-[var(--theme-text)]"
+                    >
                       {form}
                     </p>
                   </div>
