@@ -1,4 +1,3 @@
-import Script from 'next/script';
 import type { ReactNode } from "react";
 
 import { TelegramContextProvider } from "@/components/telegram-context";
@@ -10,13 +9,5 @@ interface TelegramProviderProps {
 }
 
 export function TelegramProvider({ children }: TelegramProviderProps) {
-  return (
-    <>
-      <Script
-        src="https://telegram.org/js/telegram-web-app.js"
-        strategy="beforeInteractive"
-      />
-      <TelegramContextProvider>{children}</TelegramContextProvider>
-    </>
-  );
+  return <TelegramContextProvider>{children}</TelegramContextProvider>;
 }
