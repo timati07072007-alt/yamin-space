@@ -6,9 +6,9 @@ import { useState } from "react";
 
 import { BottomNav, type TabId } from "@/components/bottom-nav";
 import { CoinTransferForm } from "@/components/coin-transfer-form";
+import { KnowledgeHub } from "@/components/knowledge-hub";
 import { PrayerTimesWidget } from "@/components/prayer-times-widget";
 import { QiblaCompass } from "@/components/qibla-compass";
-import { QuizWizard } from "@/components/quiz-wizard";
 import { useTelegram } from "@/components/telegram-provider";
 import type { DbUser } from "@/lib/users";
 
@@ -115,7 +115,7 @@ function HomeContent({ dbUser, isDevMode }: HomeContentProps) {
               exit="exit"
               className="flex w-full flex-col items-center gap-5"
             >
-              <QuizWizard />
+              <KnowledgeHub />
             </motion.div>
           )}
         </AnimatePresence>
