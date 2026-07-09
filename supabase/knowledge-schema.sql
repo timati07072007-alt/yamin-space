@@ -1,33 +1,5 @@
--- Yamin Space: раздел знаний (книги и хадисы)
--- Выполни этот скрипт в Supabase Dashboard -> SQL Editor.
-
--- 1. Книги
-create table if not exists public.books (
-  id bigint generated always as identity primary key,
-  title text not null,
-  author text not null,
-  description text not null default '',
-  category_age text not null default 'adults'
-    check (category_age in ('children', 'teens', 'adults')),
-  content_url text,
-  content_text text,
-  created_at timestamptz not null default now()
-);
-
-create index if not exists books_category_idx on public.books (category_age);
-
--- 2. Хадисы
-create table if not exists public.hadiths (
-  id bigint generated always as identity primary key,
-  text_ru text not null,
-  author text not null,
-  collection text not null,
-  authenticity text not null default 'sahih'
-    check (authenticity in ('sahih', 'hasan', 'daif')),
-  created_at timestamptz not null default now()
-);
-
--- 3. Тестовые данные: книги
+-- Yamin Space: раздел знаний (книги и хадисы) — только seed
+-- DDL: supabase/init.sql
 insert into public.books (title, author, description, category_age, content_url) values
   ('Мой первый намаз', 'Абдуррахман аль-Кари',
    'Красочное пособие, которое учит детей совершать намаз шаг за шагом.',

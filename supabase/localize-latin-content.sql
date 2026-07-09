@@ -1,12 +1,6 @@
 -- Yamin Space: локализация латиницы в контенте Supabase
--- 1) Перезаписывает вопросы академии (quiz 4–6) — выполни seed-academy.sql
--- 2) Переводит Kelly-слова с английского translation_ru на русский
-
--- === Шаг 1: вопросы академии ===
--- Скопируй и выполни содержимое supabase/seed-academy.sql целиком,
--- либо выполни этот файл после него.
-
--- === Шаг 2: Kelly / частотные слова ===
+-- Сначала выполните supabase/init.sql и seed-скрипты (arabic_words, questions).
+-- Затем этот файл в Supabase SQL Editor.
 UPDATE public.arabic_words AS w SET translation_ru = m.ru
 FROM (VALUES
   ('through', 'Через'),

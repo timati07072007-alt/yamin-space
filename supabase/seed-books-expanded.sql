@@ -1,5 +1,6 @@
 -- Yamin Space: расширение библиотеки (18 новых книг)
--- Выполнить в Supabase SQL Editor после knowledge-schema.sql
+-- Сначала выполните supabase/init.sql (создание таблицы books).
+-- Затем этот файл в Supabase SQL Editor.
 
 INSERT INTO public.books (title, author, description, category_age, content_text)
 SELECT v.title, v.author, v.description, v.category_age, v.content_text
