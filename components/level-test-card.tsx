@@ -267,17 +267,17 @@ export function LevelTestCard({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[70] flex flex-col bg-[#faf6ee]/95 backdrop-blur-md"
+        className="level-test-modal fixed inset-0 z-[70] flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-[#faf6ee]/95 backdrop-blur-md"
       >
-        <div className="flex items-center gap-3 border-b border-stone-200/80 px-5 py-4">
-          <div className="flex h-9 w-9 items-center justify-center rounded-2xl border border-amber-200 bg-amber-100/80 text-amber-700">
-            <Award className="h-4.5 w-4.5" />
+        <div className="flex shrink-0 items-center gap-2.5 border-b border-stone-200/80 px-4 py-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl border border-amber-200 bg-amber-100/80 text-amber-700">
+            <Award className="h-4 w-4" />
           </div>
           <div className="min-w-0 flex-1">
             <h2 className="truncate text-sm font-semibold text-stone-800">
               Тест на уровень знаний
             </h2>
-            <p className="text-xs text-stone-400">
+            <p className="text-[11px] text-stone-400">
               {phase === "results"
                 ? "Результаты"
                 : `Вопрос ${Math.min(questionIndex + 1, questions.length)} из ${questions.length}`}
@@ -288,13 +288,13 @@ export function LevelTestCard({
             onClick={closeModal}
             whileTap={{ scale: 0.9 }}
             aria-label="Закрыть"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-500"
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-500"
           >
-            <X className="h-4.5 w-4.5" />
+            <X className="h-4 w-4" />
           </motion.button>
         </div>
 
-        <div className="flex flex-1 flex-col overflow-y-auto px-5 py-6">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-3">
           {(phase === "loading" || phase === "submitting") && (
             <div className="flex flex-1 items-center justify-center gap-2 text-sm text-stone-400">
               <Loader2 className="h-5 w-5 animate-spin" />
@@ -305,12 +305,12 @@ export function LevelTestCard({
           {phase === "playing" && question && (
             <motion.div
               key={question.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ type: "spring", stiffness: 280, damping: 24 }}
-              className="mx-auto w-full max-w-md"
+              className="mx-auto flex h-full min-h-0 w-full max-w-md flex-col"
             >
-              <div className="mb-4 h-1.5 overflow-hidden rounded-full bg-stone-200/70">
+              <div className="mb-2 h-1 shrink-0 overflow-hidden rounded-full bg-stone-200/70">
                 <motion.div
                   animate={{
                     width: `${((questionIndex + 1) / questions.length) * 100}%`,
@@ -319,22 +319,21 @@ export function LevelTestCard({
                 />
               </div>
 
-              <p className="mb-5 text-base font-medium leading-snug text-stone-800">
+              <p className="mb-2 line-clamp-4 shrink-0 text-[13px] font-medium leading-snug text-stone-800">
                 {question.question_text}
               </p>
 
-              <ul className="space-y-2.5">
+              <ul className="flex min-h-0 flex-1 flex-col justify-center gap-1.5">
                 {question.options.map((option, index) => (
-                  <li key={index}>
+                  <li key={index} className="shrink-0">
                     <motion.button
                       type="button"
                       onClick={() => selectAnswer(index)}
-                      whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`flex w-full rounded-3xl border px-4 py-3.5 text-left text-sm transition-colors ${
+                      className={`flex w-full rounded-2xl border px-3 py-2.5 text-left text-[13px] leading-snug transition-colors ${
                         selectedIndex === index
                           ? "border-emerald-300 bg-emerald-50 text-emerald-800"
-                          : "border-stone-200/80 bg-white/80 text-stone-700 hover:border-emerald-200 hover:bg-emerald-50/50"
+                          : "border-stone-200/80 bg-white/90 text-stone-700"
                       }`}
                     >
                       {option}
@@ -350,7 +349,7 @@ export function LevelTestCard({
               initial={{ opacity: 0, scale: 0.92 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ type: "spring", stiffness: 260, damping: 20 }}
-              className="mx-auto w-full max-w-md text-center"
+              className="mx-auto flex h-full w-full max-w-md flex-col justify-center text-center"
             >
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-amber-200 bg-amber-100/80 text-amber-600">
                 <Award className="h-8 w-8" />

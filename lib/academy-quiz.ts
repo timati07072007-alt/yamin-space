@@ -45,23 +45,23 @@ const DEV_EASY: DevQuestion[] = [
 
 const DEV_MEDIUM: DevQuestion[] = [
   { id: 501, quiz_id: 5, question_text: "Куда был перенесён Пророк ﷺ в ночь Исра?", options: ["Медина", "Иерусалим", "Мекка", "Тайф"], correct_option_index: 1, xp_reward: 15, coins_reward: 8 },
-  { id: 502, quiz_id: 5, question_text: "Какая битва была первой?", options: ["Ухуд", "Бадр", "Оборона рва", "Хunayn"], correct_option_index: 1, xp_reward: 15, coins_reward: 8 },
-  { id: 503, quiz_id: 5, question_text: "Кто был первым халифом?", options: ["Умар", "Уthman", "Абу Bakr", "Али"], correct_option_index: 2, xp_reward: 15, coins_reward: 8 },
-  { id: 504, quiz_id: 5, question_text: "Кто первый муаззин?", options: ["Али", "Билал", "Умар", "Абу Bakr"], correct_option_index: 1, xp_reward: 15, coins_reward: 8 },
-  { id: 505, quiz_id: 5, question_text: "Сколько аятов в al-Fatiha?", options: ["5", "6", "7", "8"], correct_option_index: 2, xp_reward: 15, coins_reward: 8 },
+  { id: 502, quiz_id: 5, question_text: "Какая битва была первой?", options: ["Ухуд", "Бадр", "Хандак", "Хунейн"], correct_option_index: 1, xp_reward: 15, coins_reward: 8 },
+  { id: 503, quiz_id: 5, question_text: "Кто был первым халифом?", options: ["Умар (р.а.)", "Усман (р.а.)", "Абу Бакр (р.а.)", "Али (р.а.)"], correct_option_index: 2, xp_reward: 15, coins_reward: 8 },
+  { id: 504, quiz_id: 5, question_text: "Кто был первым муаззином?", options: ["Али (р.а.)", "Билал (р.а.)", "Умар (р.а.)", "Абу Бакр (р.а.)"], correct_option_index: 1, xp_reward: 15, coins_reward: 8 },
+  { id: 505, quiz_id: 5, question_text: "Сколько аятов в суре «аль-Фатиха»?", options: ["5", "6", "7", "8"], correct_option_index: 2, xp_reward: 15, coins_reward: 8 },
   { id: 506, quiz_id: 5, question_text: "Как называется миграция в Медину?", options: ["Хиджра", "Исра", "Хадж", "Умра"], correct_option_index: 0, xp_reward: 15, coins_reward: 8 },
-  { id: 507, quiz_id: 5, question_text: "Кто была первая жена Пророка ﷺ?", options: ["Аиша", "Хadija", "Сawda", "Хafsa"], correct_option_index: 1, xp_reward: 15, coins_reward: 8 },
-  { id: 508, quiz_id: 5, question_text: "Кто был «вторым в пещере»?", options: ["Али", "Абу Bakr", "Умар", "Хamza"], correct_option_index: 1, xp_reward: 15, coins_reward: 8 },
+  { id: 507, quiz_id: 5, question_text: "Кто была первая жена Пророка ﷺ?", options: ["Аиша", "Хадиджа", "Сауда", "Хафса"], correct_option_index: 1, xp_reward: 15, coins_reward: 8 },
+  { id: 508, quiz_id: 5, question_text: "Кто был «вторым в пещере»?", options: ["Али (р.а.)", "Абу Бакр (р.а.)", "Умар (р.а.)", "Хамза"], correct_option_index: 1, xp_reward: 15, coins_reward: 8 },
 ];
 
 const DEV_HARDCORE: DevQuestion[] = [
-  { id: 601, quiz_id: 6, question_text: "Сколько аятов в al-Baqara?", options: ["200", "255", "286", "300"], correct_option_index: 2, xp_reward: 25, coins_reward: 12 },
-  { id: 602, quiz_id: 6, question_text: "Кто составил «Muwatta»?", options: ["Malik ibn Anas", "Al-Bukhari", "Muslim", "Ahmad ibn Hanbal"], correct_option_index: 0, xp_reward: 25, coins_reward: 12 },
-  { id: 603, quiz_id: 6, question_text: "Сколько juz в Коране?", options: ["20", "30", "40", "114"], correct_option_index: 1, xp_reward: 25, coins_reward: 12 },
-  { id: 604, quiz_id: 6, question_text: "Кто был «As-Siddiq»?", options: ["Умар", "Абу Bakr", "Али", "Уthman"], correct_option_index: 1, xp_reward: 25, coins_reward: 12 },
-  { id: 605, quiz_id: 6, question_text: "В каком году был завоёван Мекka?", options: ["6 AH", "8 AH", "10 AH", "2 AH"], correct_option_index: 1, xp_reward: 25, coins_reward: 12 },
-  { id: 606, quiz_id: 6, question_text: "Кто составил «Riyadh as-Salihin»?", options: ["An-Nawawi", "Al-Bukhari", "Ibn Majah", "Ad-Daraqutni"], correct_option_index: 0, xp_reward: 25, coins_reward: 12 },
-  { id: 607, quiz_id: 6, question_text: "Какой месяц начинает исламский календарь?", options: ["Ramadan", "Muharram", "Rajab", "Shawwal"], correct_option_index: 1, xp_reward: 25, coins_reward: 12 },
+  { id: 601, quiz_id: 6, question_text: "Сколько аятов в суре «аль-Бакара»?", options: ["200", "255", "286", "300"], correct_option_index: 2, xp_reward: 25, coins_reward: 12 },
+  { id: 602, quiz_id: 6, question_text: "Кто составил «Муватта»?", options: ["Малик ибн Анас", "Аль-Бухари", "Муслим", "Ахмад ибн Ханбал"], correct_option_index: 0, xp_reward: 25, coins_reward: 12 },
+  { id: 603, quiz_id: 6, question_text: "Сколько джузов в Коране?", options: ["20", "30", "40", "114"], correct_option_index: 1, xp_reward: 25, coins_reward: 12 },
+  { id: 604, quiz_id: 6, question_text: "Кто был «Ас-Сиддик»?", options: ["Умар", "Абу Бакр (р.а.)", "Али", "Усман"], correct_option_index: 1, xp_reward: 25, coins_reward: 12 },
+  { id: 605, quiz_id: 6, question_text: "В каком году был завоёван Мекка?", options: ["6 г. х.", "8 г. х.", "10 г. х.", "2 г. х."], correct_option_index: 1, xp_reward: 25, coins_reward: 12 },
+  { id: 606, quiz_id: 6, question_text: "Кто составил «Рияд ас-Салихин»?", options: ["Ан-Навави", "Аль-Бухари", "Ибн Маджа", "Ад-Даракутни"], correct_option_index: 0, xp_reward: 25, coins_reward: 12 },
+  { id: 607, quiz_id: 6, question_text: "Какой месяц начинает исламский календарь?", options: ["Рамадан", "Мухаррам", "Раджаб", "Шавваль"], correct_option_index: 1, xp_reward: 25, coins_reward: 12 },
   { id: 608, quiz_id: 6, question_text: "Сколько лет Пророк ﷺ пророчествовал?", options: ["10", "13", "23", "40"], correct_option_index: 2, xp_reward: 25, coins_reward: 12 },
 ];
 
