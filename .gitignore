@@ -48,3 +48,17 @@ supabase/seed-mcp-parts/
 scripts/to_import.csv
 scripts/debug-csv.mjs
 .cursor/
+
+# bot temp / MCP apply artifacts
+.mcp-*
+.stmt-*
+.apply-*
+.bulk-*
+.combined-*
+.cur-*
+.part*
+.q-*
+.remaining-*
+.tmp-*
+.all-*
+.mcpq/

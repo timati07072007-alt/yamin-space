@@ -105,6 +105,8 @@ export async function syncTelegramUser(
     .from("users")
     .update({
       last_seen: new Date().toISOString(),
+      username: telegramUser.username ?? null,
+      first_name: telegramUser.first_name,
       ...(resetWeekly
         ? {
             week_key: weekKey,
