@@ -2,13 +2,14 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { BookOpen, Brain, Grid3X3, Languages } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { ArabicAlphabetPanel } from "@/components/arabic-alphabet-panel";
 import { ArabicDictionaryPanel } from "@/components/arabic-dictionary-panel";
 import { ArabicGrammarPanel } from "@/components/arabic-grammar-panel";
 import { ArabicLearnPanel } from "@/components/arabic-learn-panel";
 import { cozyCardClass, staggerContainer, staggerItem } from "@/lib/animations";
+import { primeArabicVoices } from "@/lib/arabic-audio";
 import { hapticSelection } from "@/lib/haptic";
 
 type ArabicSection = "alphabet" | "words" | "learn" | "grammar";
@@ -52,6 +53,10 @@ const SECTIONS: Array<{
 
 export function ArabicHub() {
   const [section, setSection] = useState<ArabicSection>("alphabet");
+
+  useEffect(() => {
+    primeArabicVoices();
+  }, []);
 
   return (
     <motion.div

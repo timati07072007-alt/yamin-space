@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { useTelegram } from "@/components/telegram-provider";
 import { fireCelebrationConfetti } from "@/lib/confetti";
@@ -61,9 +62,14 @@ export function LevelTestCard({
   const [score, setScore] = useState(0);
   const [xpAwarded, setXpAwarded] = useState(0);
   const [coinsAwarded, setCoinsAwarded] = useState(0);
+  const [mounted, setMounted] = useState(false);
 
   const question = questions[questionIndex] ?? null;
   const isModalOpen = phase === "loading" || phase === "playing" || phase === "submitting" || phase === "results";
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!isModalOpen) {
@@ -222,7 +228,12 @@ export function LevelTestCard({
           <ChevronRight className="h-4 w-4 text-stone-400" />
         </motion.button>
 
-        <AnimatePresence>{isModalOpen && renderModal()}</AnimatePresence>
+        {mounted && isModalOpen
+          ? createPortal(
+              <AnimatePresence>{renderModal()}</AnimatePresence>,
+              document.body,
+            )
+          : null}
       </>
     );
   }
@@ -257,7 +268,12 @@ export function LevelTestCard({
         )}
       </div>
 
-      <AnimatePresence>{isModalOpen && renderModal()}</AnimatePresence>
+      {mounted && isModalOpen
+        ? createPortal(
+            <AnimatePresence>{renderModal()}</AnimatePresence>,
+            document.body,
+          )
+        : null}
     </section>
   );
 
@@ -267,9 +283,13 @@ export function LevelTestCard({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="level-test-modal fixed inset-0 z-[70] flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-[#faf6ee]/95 backdrop-blur-md"
+        className="level-test-modal fixed inset-0 z-[100] flex h-[100dvh] max-h-[100dvh] flex-col bg-[#faf6ee]/95 backdrop-blur-md"
+        style={{
+          paddingTop: "env(safe-area-inset-top)",
+          paddingBottom: "env(safe-area-inset-bottom)",
+        }}
       >
-        <div className="flex shrink-0 items-center gap-2.5 border-b border-stone-200/80 px-4 py-3">
+        <div className="flex shrink-0 items-center gap-2 border-b border-stone-200/80 px-3 py-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-xl border border-amber-200 bg-amber-100/80 text-amber-700">
             <Award className="h-4 w-4" />
           </div>
@@ -294,7 +314,7 @@ export function LevelTestCard({
           </motion.button>
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-3">
+        <div className="flex min-h-0 flex-1 flex-col justify-center px-3 py-2">
           {(phase === "loading" || phase === "submitting") && (
             <div className="flex flex-1 items-center justify-center gap-2 text-sm text-stone-400">
               <Loader2 className="h-5 w-5 animate-spin" />
@@ -308,35 +328,41 @@ export function LevelTestCard({
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ type: "spring", stiffness: 280, damping: 24 }}
-              className="mx-auto flex h-full min-h-0 w-full max-w-md flex-col"
+              className="mx-auto flex min-h-0 w-full max-w-md flex-col gap-2 pt-0.5"
             >
-              <div className="mb-2 h-1 shrink-0 overflow-hidden rounded-full bg-stone-200/70">
-                <motion.div
-                  animate={{
-                    width: `${((questionIndex + 1) / questions.length) * 100}%`,
-                  }}
-                  className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-amber-400"
-                />
+              <div className="shrink-0 space-y-1">
+                <div className="h-1 overflow-hidden rounded-full bg-stone-200/70">
+                  <motion.div
+                    animate={{
+                      width: `${((questionIndex + 1) / questions.length) * 100}%`,
+                    }}
+                    className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-amber-400"
+                  />
+                </div>
+
+                <p className="text-[10px] font-medium uppercase tracking-wide text-stone-400">
+                  Вопрос {questionIndex + 1} из {questions.length}
+                </p>
+
+                <p className="line-clamp-3 text-xs font-medium leading-snug text-stone-800">
+                  {question.question_text}
+                </p>
               </div>
 
-              <p className="mb-2 line-clamp-4 shrink-0 text-[13px] font-medium leading-snug text-stone-800">
-                {question.question_text}
-              </p>
-
-              <ul className="flex min-h-0 flex-1 flex-col justify-center gap-1.5">
+              <ul className="flex flex-col gap-1">
                 {question.options.map((option, index) => (
-                  <li key={index} className="shrink-0">
+                  <li key={index}>
                     <motion.button
                       type="button"
                       onClick={() => selectAnswer(index)}
                       whileTap={{ scale: 0.98 }}
-                      className={`flex w-full rounded-2xl border px-3 py-2.5 text-left text-[13px] leading-snug transition-colors ${
+                      className={`flex min-h-[2.1rem] w-full items-center rounded-xl border px-2.5 py-1.5 text-left text-[11px] leading-tight transition-colors ${
                         selectedIndex === index
                           ? "border-emerald-300 bg-emerald-50 text-emerald-800"
                           : "border-stone-200/80 bg-white/90 text-stone-700"
                       }`}
                     >
-                      {option}
+                      <span className="line-clamp-2">{option}</span>
                     </motion.button>
                   </li>
                 ))}
@@ -349,41 +375,43 @@ export function LevelTestCard({
               initial={{ opacity: 0, scale: 0.92 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ type: "spring", stiffness: 260, damping: 20 }}
-              className="mx-auto flex h-full w-full max-w-md flex-col justify-center text-center"
+              className="mx-auto flex h-full min-h-0 w-full max-w-md flex-col justify-between gap-3 py-1"
             >
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-amber-200 bg-amber-100/80 text-amber-600">
-                <Award className="h-8 w-8" />
+              <div className="shrink-0 text-center">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-amber-200 bg-amber-100/80 text-amber-600">
+                  <Award className="h-7 w-7" />
+                </div>
+
+                <h3 className="mt-3 text-lg font-semibold text-stone-800">
+                  Тест завершён!
+                </h3>
+                <p className="mt-0.5 text-xs text-stone-500">
+                  Правильных ответов: {score} из {questions.length}
+                </p>
+
+                <p
+                  className={`mx-auto mt-3 inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${TITLE_STYLES[resultTitle]}`}
+                >
+                  {resultTitle}
+                </p>
               </div>
 
-              <h3 className="mt-4 text-xl font-semibold text-stone-800">
-                Тест завершён!
-              </h3>
-              <p className="mt-1 text-sm text-stone-500">
-                Правильных ответов: {score} из {questions.length}
-              </p>
-
-              <p
-                className={`mx-auto mt-4 inline-flex rounded-full border px-4 py-1.5 text-sm font-semibold ${TITLE_STYLES[resultTitle]}`}
-              >
-                {resultTitle}
-              </p>
-
-              <div className="mt-5 grid grid-cols-2 gap-3">
-                <div className="rounded-3xl border border-emerald-100 bg-emerald-50/70 p-4">
-                  <div className="mb-1 flex items-center justify-center gap-1 text-emerald-700">
-                    <Sparkles className="h-4 w-4" />
-                    <span className="text-xs uppercase">XP</span>
+              <div className="grid shrink-0 grid-cols-2 gap-2">
+                <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-3">
+                  <div className="mb-0.5 flex items-center justify-center gap-1 text-emerald-700">
+                    <Sparkles className="h-3.5 w-3.5" />
+                    <span className="text-[10px] uppercase">XP</span>
                   </div>
-                  <p className="text-2xl font-semibold text-stone-800">
+                  <p className="text-xl font-semibold text-stone-800">
                     +{xpAwarded}
                   </p>
                 </div>
-                <div className="rounded-3xl border border-amber-100 bg-amber-50/70 p-4">
-                  <div className="mb-1 flex items-center justify-center gap-1 text-amber-600">
-                    <Coins className="h-4 w-4" />
-                    <span className="text-xs uppercase">Монеты</span>
+                <div className="rounded-2xl border border-amber-100 bg-amber-50/70 p-3">
+                  <div className="mb-0.5 flex items-center justify-center gap-1 text-amber-600">
+                    <Coins className="h-3.5 w-3.5" />
+                    <span className="text-[10px] uppercase">Монеты</span>
                   </div>
-                  <p className="text-2xl font-semibold text-stone-800">
+                  <p className="text-xl font-semibold text-stone-800">
                     +{coinsAwarded}
                   </p>
                 </div>
@@ -394,7 +422,7 @@ export function LevelTestCard({
                 onClick={closeModal}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="mt-6 w-full rounded-3xl border border-emerald-300 bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 py-3.5 text-sm font-semibold text-white"
+                className="shrink-0 w-full rounded-2xl border border-emerald-300 bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 py-3 text-sm font-semibold text-white"
               >
                 Отлично!
               </motion.button>

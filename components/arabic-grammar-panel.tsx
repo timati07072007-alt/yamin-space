@@ -2,15 +2,19 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { BookMarked, ChevronDown, Volume2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { cozyCardClass } from "@/lib/animations";
-import { speakArabic } from "@/lib/arabic-alphabet";
+import { primeArabicVoices, speakArabic } from "@/lib/arabic-audio";
 import { GRAMMAR_RULES } from "@/lib/arabic-grammar";
 import { hapticSelection } from "@/lib/haptic";
 
 export function ArabicGrammarPanel() {
   const [openId, setOpenId] = useState<string | null>(GRAMMAR_RULES[0]?.id ?? null);
+
+  useEffect(() => {
+    primeArabicVoices();
+  }, []);
 
   return (
     <div className={`${cozyCardClass} px-4 py-4`}>

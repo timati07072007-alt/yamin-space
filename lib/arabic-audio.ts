@@ -1,11 +1,9 @@
 /**
  * Arabic audio playback with preferred female voice selection.
- * Priority: Supabase audio_url -> Web Speech (best female ar voice).
+ * Uses Web Speech API with ar-SA + female voice heuristics.
  */
 
-let voicesCache: SpeechSynthesisVoice[] | null = null;
-let preferredVoice: SpeechSynthesisVoice | null = null;
-let voicesReady = false;
+let voicesReadyPromise: Promise<SpeechSynthesisVoice[]> | null = null;
 
 const FEMALE_HINTS = [
   "female",
@@ -15,87 +13,169 @@ const FEMALE_HINTS = [
   "amira",
   "layla",
   "laila",
+  "fatima",
+  "mariam",
+  "noura",
 ];
 
-const MALE_HINTS = ["male", "naayf", "majed", "tarik", "omar", "youssef", "meed", "rauf"];
+const MALE_HINTS = [
+  "male",
+  "naayf",
+  "majed",
+  "maged",
+  "tarik",
+  "omar",
+  "youssef",
+  "meed",
+  "rauf",
+  "hamza",
+];
+
+const PREFERRED_LANGS = ["ar-sa", "ar-eg", "ar-ae", "ar-xa", "ar"];
 
 function loadVoices(): SpeechSynthesisVoice[] {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) {
     return [];
   }
-  voicesCache = window.speechSynthesis.getVoices();
-  if (voicesCache.length > 0) {
-    voicesReady = true;
+  return window.speechSynthesis.getVoices();
+}
+
+/** Wait until the browser exposes speech voices (critical on iOS / Telegram WebView). */
+export function waitForArabicVoices(timeoutMs = 1800): Promise<SpeechSynthesisVoice[]> {
+  if (voicesReadyPromise) {
+    return voicesReadyPromise;
   }
-  return voicesCache;
+
+  voicesReadyPromise = new Promise((resolve) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+      resolve([]);
+      return;
+    }
+
+    const synth = window.speechSynthesis;
+
+    const finish = () => {
+      const voices = synth.getVoices();
+      resolve(voices);
+    };
+
+    const tryPick = () => {
+      const voices = synth.getVoices();
+      if (voices.length > 0) {
+        finish();
+        return true;
+      }
+      return false;
+    };
+
+    if (tryPick()) {
+      return;
+    }
+
+    const onChange = () => {
+      if (tryPick()) {
+        synth.removeEventListener("voiceschanged", onChange);
+      }
+    };
+
+    synth.addEventListener("voiceschanged", onChange);
+    synth.getVoices();
+
+    window.setTimeout(() => {
+      synth.removeEventListener("voiceschanged", onChange);
+      finish();
+    }, timeoutMs);
+  });
+
+  return voicesReadyPromise;
 }
 
 function scoreVoice(v: SpeechSynthesisVoice): number {
   let score = 0;
   const name = v.name.toLowerCase();
+  const lang = v.lang.toLowerCase();
 
-  if (MALE_HINTS.some((hint) => name.includes(hint))) score -= 40;
-  if (FEMALE_HINTS.some((hint) => name.includes(hint))) score += 35;
+  if (MALE_HINTS.some((hint) => name.includes(hint))) score -= 100;
+  if (FEMALE_HINTS.some((hint) => name.includes(hint))) score += 80;
 
-  if (name.includes("google") && name.includes("arab")) score += 28;
+  if (name.includes("google") && name.includes("arab")) score += 40;
   if (name.includes("microsoft") && (name.includes("hoda") || name.includes("zira"))) {
-    score += 32;
+    score += 45;
   }
   if (name.includes("premium") || name.includes("natural") || name.includes("neural")) {
-    score += 24;
+    score += 30;
   }
-  if (v.lang === "ar-SA" || v.lang === "ar-EG" || v.lang === "ar-AE") score += 12;
-  if (!v.localService) score += 6;
+
+  const langRank = PREFERRED_LANGS.indexOf(lang);
+  if (langRank >= 0) score += 20 - langRank * 2;
+
+  if (!v.localService) score += 8;
 
   return score;
 }
 
-/** Prefer natural-sounding Arabic female voices when available. */
-export function pickArabicVoice(): SpeechSynthesisVoice | null {
-  if (preferredVoice) return preferredVoice;
-
-  const voices = loadVoices();
+/** Pick the best available Arabic female voice (re-evaluated each call). */
+export function pickArabicVoice(
+  voices: SpeechSynthesisVoice[] = loadVoices(),
+): SpeechSynthesisVoice | null {
   if (voices.length === 0) return null;
 
-  const ranked = voices
-    .filter((v) => v.lang.toLowerCase().startsWith("ar"))
-    .sort((a, b) => scoreVoice(b) - scoreVoice(a));
+  const arabic = voices.filter((v) => v.lang.toLowerCase().startsWith("ar"));
+  if (arabic.length === 0) return null;
 
-  preferredVoice =
-    ranked[0] ?? voices.find((v) => v.lang.toLowerCase().startsWith("ar")) ?? null;
-  return preferredVoice;
+  const femaleOnly = arabic.filter((v) =>
+    FEMALE_HINTS.some((hint) => v.name.toLowerCase().includes(hint)),
+  );
+
+  const nonMale = arabic.filter(
+    (v) => !MALE_HINTS.some((hint) => v.name.toLowerCase().includes(hint)),
+  );
+
+  const pool = femaleOnly.length > 0 ? femaleOnly : nonMale.length > 0 ? nonMale : arabic;
+
+  return [...pool].sort((a, b) => scoreVoice(b) - scoreVoice(a))[0] ?? null;
 }
 
 export function primeArabicVoices(): void {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
 
-  loadVoices();
-  pickArabicVoice();
+  void waitForArabicVoices().then((voices) => {
+    pickArabicVoice(voices);
+  });
 
   window.speechSynthesis.onvoiceschanged = () => {
-    voicesCache = null;
-    preferredVoice = null;
-    voicesReady = false;
-    loadVoices();
-    pickArabicVoice();
-    voicesReady = true;
+    voicesReadyPromise = null;
+    void waitForArabicVoices();
   };
-
-  window.setTimeout(() => {
-    if (!voicesReady) {
-      loadVoices();
-      pickArabicVoice();
-    }
-  }, 250);
 }
 
 let currentAudio: HTMLAudioElement | null = null;
+
+function isTrustedRecordedAudio(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return (
+      parsed.pathname.includes("/storage/v1/object/public/arabic-audio/") &&
+      /\.(mp3|ogg|wav|m4a)(\?|$)/i.test(parsed.pathname)
+    );
+  } catch {
+    return false;
+  }
+}
 
 export async function playArabicAudio(
   text: string,
   audioUrl?: string | null,
 ): Promise<void> {
-  if (audioUrl) {
+  // Prefer Web Speech with female voice — seed audio URLs are often missing or robotic.
+  try {
+    await speakArabic(text);
+    return;
+  } catch {
+    // fall through to recorded audio
+  }
+
+  if (audioUrl && isTrustedRecordedAudio(audioUrl)) {
     try {
       if (currentAudio) {
         currentAudio.pause();
@@ -104,12 +184,10 @@ export async function playArabicAudio(
       const audio = new Audio(audioUrl);
       currentAudio = audio;
       await audio.play();
-      return;
     } catch {
-      // fallback to TTS
+      await speakArabic(text);
     }
   }
-  await speakArabic(text);
 }
 
 export function speakArabic(text: string): Promise<void> {
@@ -119,31 +197,25 @@ export function speakArabic(text: string): Promise<void> {
       return;
     }
 
-    window.speechSynthesis.cancel();
+    void waitForArabicVoices().then((voices) => {
+      window.speechSynthesis.cancel();
 
-    const run = () => {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = "ar-SA";
-      utterance.rate = 0.72;
-      utterance.pitch = 1.12;
+      utterance.rate = 0.78;
+      utterance.pitch = 1.14;
       utterance.volume = 1;
 
-      const voice = pickArabicVoice();
-      if (voice) utterance.voice = voice;
+      const voice = pickArabicVoice(voices);
+      if (voice) {
+        utterance.voice = voice;
+        utterance.lang = voice.lang || "ar-SA";
+      }
 
       utterance.onend = () => resolve();
       utterance.onerror = () => resolve();
       window.speechSynthesis.speak(utterance);
-    };
-
-    if (!voicesReady) {
-      loadVoices();
-      pickArabicVoice();
-      window.setTimeout(run, 80);
-      return;
-    }
-
-    run();
+    });
   });
 }
 

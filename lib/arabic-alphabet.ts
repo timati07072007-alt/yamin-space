@@ -63,18 +63,7 @@ export const ARABIC_ALPHABET: ArabicLetter[] = ARABIC_ALPHABET_FULL.map(
   }),
 );
 
-export function speakArabic(text: string): void {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "ar-SA";
-  utterance.rate = 0.82;
-  window.speechSynthesis.speak(utterance);
-}
-
-export function speakArabicLetter(speech: string): void {
-  speakArabic(speech);
-}
+export { speakArabic, speakArabicLetter, primeArabicVoices } from "@/lib/arabic-audio";
 
 export function pickGameOptions(correctIndex: number): ArabicLetter[] {
   const correct = ARABIC_ALPHABET[correctIndex];
