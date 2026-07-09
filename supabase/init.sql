@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS public.users (
   weekly_xp integer NOT NULL DEFAULT 0,
   week_key text NOT NULL DEFAULT '',
   last_seen timestamptz NOT NULL DEFAULT now(),
+  namaz_notifications boolean NOT NULL DEFAULT false,
   created_at timestamptz NOT NULL DEFAULT now()
 );
 

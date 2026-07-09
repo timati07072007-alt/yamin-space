@@ -134,3 +134,60 @@ async def fetch_all_user_ids(settings: Settings) -> list[int]:
         rows = response.json()
 
     return [int(row["id"]) for row in rows if row.get("id") is not None]
+
+
+async def get_namaz_notifications(settings: Settings, user_id: int) -> bool:
+    headers = _supabase_headers(settings)
+    url = f"{_rest_base(settings)}/users"
+
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        response = await client.get(
+            url,
+            headers=headers,
+            params={"id": f"eq.{user_id}", "select": "namaz_notifications"},
+        )
+        response.raise_for_status()
+        rows = response.json()
+
+    if not rows:
+        return False
+
+    return bool(rows[0].get("namaz_notifications"))
+
+
+async def set_namaz_notifications(
+    settings: Settings,
+    user_id: int,
+    enabled: bool,
+) -> None:
+    headers = _supabase_headers(settings)
+    url = f"{_rest_base(settings)}/users"
+
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        response = await client.patch(
+            url,
+            headers=headers,
+            params={"id": f"eq.{user_id}"},
+            json={"namaz_notifications": enabled},
+        )
+        response.raise_for_status()
+
+
+async def fetch_namaz_subscriber_ids(settings: Settings) -> list[int]:
+    headers = _supabase_headers(settings)
+    url = f"{_rest_base(settings)}/users"
+
+    async with httpx.AsyncClient(timeout=60.0) as client:
+        response = await client.get(
+            url,
+            headers=headers,
+            params={
+                "select": "id",
+                "namaz_notifications": "eq.true",
+                "order": "id.asc",
+            },
+        )
+        response.raise_for_status()
+        rows = response.json()
+
+    return [int(row["id"]) for row in rows if row.get("id") is not None]

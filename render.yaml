@@ -1,0 +1,25 @@
+# Деплой Telegram-бота 24/7 на Render (Background Worker).
+# 1. Подключите репозиторий на https://dashboard.render.com
+# 2. New → Blueprint → выберите этот render.yaml
+# 3. Задайте секреты в Dashboard → Environment:
+#    TELEGRAM_BOT_TOKEN, NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+services:
+  - type: worker
+    name: yamin-space-bot
+    runtime: docker
+    dockerfilePath: ./bot/Dockerfile
+    dockerContext: ./bot
+    plan: starter
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: WEBAPP_URL
+        value: https://yamin-space.vercel.app
+      - key: SYNC_API_URL
+        value: https://yamin-space.vercel.app/api/user/sync
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: ADMIN_USERNAME
+        value: netxght_v
