@@ -139,7 +139,13 @@ async function ensureDiamondsRow(
     .maybeSingle();
 
   if (!data) {
-    await supabase.from("diamonds_balance").insert({ user_id: userId, balance: 0 });
+    const { error } = await supabase
+      .from("diamonds_balance")
+      .insert({ user_id: userId, balance: 0 });
+
+    if (error) {
+      throw new Error(error.message);
+    }
   }
 }
 
