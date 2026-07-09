@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+node_modules/
+.next/
+.git/
+scripts/
+supabase/*.stripped.sql
+supabase/_batch_queries.txt
