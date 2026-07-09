@@ -7,8 +7,8 @@ services:
   - type: worker
     name: yamin-space-bot
     runtime: docker
-    dockerfilePath: ./bot/Dockerfile
-    dockerContext: ./bot
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     plan: starter
     envVars:
       - key: TELEGRAM_BOT_TOKEN

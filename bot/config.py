@@ -6,7 +6,11 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv(Path(__file__).resolve().parent / ".env")
+_BOT_DIR = Path(__file__).resolve().parent
+_PROJECT_ROOT = _BOT_DIR.parent
+
+load_dotenv(_BOT_DIR / ".env")
+load_dotenv(_PROJECT_ROOT / ".env")
 
 
 @dataclass(frozen=True)

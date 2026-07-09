@@ -8,13 +8,13 @@ import httpx
 from aiogram.exceptions import TelegramAPIError
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from prayer_times import bishkek_now_hm, bishkek_today_key, fetch_bishkek_prayer_times
-from users_sync import fetch_namaz_subscriber_ids
+from bot.prayer_times import bishkek_now_hm, bishkek_today_key, fetch_bishkek_prayer_times
+from bot.users_sync import fetch_namaz_subscriber_ids
 
 if TYPE_CHECKING:
     from aiogram import Bot
 
-    from config import Settings
+    from bot.config import Settings
 
 logger = logging.getLogger(__name__)
 

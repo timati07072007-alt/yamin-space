@@ -7,7 +7,7 @@ from typing import Any
 import httpx
 from aiogram.types import User as TelegramUser
 
-from config import Settings
+from bot.config import Settings
 
 logger = logging.getLogger(__name__)
 

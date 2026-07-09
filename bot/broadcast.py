@@ -8,8 +8,8 @@ from dataclasses import dataclass
 from aiogram import Bot
 from aiogram.exceptions import TelegramAPIError
 
-from config import Settings, load_settings
-from users_sync import fetch_all_user_ids
+from bot.config import Settings, load_settings
+from bot.users_sync import fetch_all_user_ids
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

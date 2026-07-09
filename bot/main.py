@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import logging
 from typing import Any, Awaitable, Callable
 
@@ -16,9 +15,9 @@ from aiogram.types import (
     WebAppInfo,
 )
 
-from config import Settings, load_settings
-from namaz_scheduler import start_namaz_scheduler, stop_namaz_scheduler
-from users_sync import (
+from bot.config import Settings, load_settings
+from bot.namaz_scheduler import start_namaz_scheduler, stop_namaz_scheduler
+from bot.users_sync import (
     get_namaz_notifications,
     set_namaz_notifications,
     sync_user_to_supabase,
@@ -219,7 +218,7 @@ async def cmd_broadcast(message: Message, settings: Settings, bot: Bot) -> None:
     )
 
 
-async def main() -> None:
+async def run_bot() -> None:
     settings = load_settings()
     bot = Bot(token=settings.bot_token)
     dispatcher = Dispatcher()
@@ -250,7 +249,3 @@ async def main() -> None:
 
     logger.info("Yamin Space bot started (polling)")
     await dispatcher.start_polling(bot)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
